@@ -17,7 +17,6 @@ public class Member {
     private LocalDate joinedAt;
     private double attendanceRate;
     private List<Feedback> feedbacks;
-    private List<Badge> badges;
     private Role role;
 
     public double getAttendaceRate() {
@@ -37,10 +36,6 @@ public class Member {
 
     public LocalDate getJoinedDate() {
         return this.joinedAt;
-    }
-
-    public List<Badge> getBadges() {
-        return this.badges;
     }
 
     public void setRole(Role role) {
