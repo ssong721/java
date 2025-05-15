@@ -11,6 +11,7 @@
 	<groupId>com.meetingjava</groupId>
 	<artifactId>snowball</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>snowball</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -40,6 +41,10 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

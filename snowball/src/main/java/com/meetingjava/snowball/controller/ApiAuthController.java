@@ -1,4 +1,4 @@
-package com;
+package com.meetingjava.snowball.controller;
 
 // 카카오톡 로그인 하면 데이터 베이스랑 연결해주고 출력까지 흐름? 이라고,,,
 
@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import jakarta.servlet.http.HttpSession;
 import java.util.Map;
+
+import com.meetingjava.snowball.API.KakaoService;
+import com.meetingjava.snowball.repository.UserDao;
+import com.meetingjava.snowball.entity.User;
 
 @RestController
 @RequestMapping("/api/auth/kakao")

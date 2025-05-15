@@ -1,4 +1,4 @@
-package com;
+package com.meetingjava.snowball.entity;
 
 // 얘가 변수보관
 

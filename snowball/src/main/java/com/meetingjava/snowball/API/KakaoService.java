@@ -1,4 +1,4 @@
-package com;
+package com.meetingjava.snowball.API;
 
 // 카카오톡 간편 로그인
 

@@ -1,4 +1,4 @@
-package com;
+package com.meetingjava.snowball.repository;
 
 // 이게 데이터 베이스 연산
 
@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Value;
 import jakarta.annotation.PostConstruct;
 import java.sql.*;
+
+import com.meetingjava.snowball.entity.User;
 
 @Repository
 public class UserDao {
