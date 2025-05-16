@@ -1,4 +1,4 @@
-package meeting_practice;
+package com.meetingjava.snowball.entity;
 
 import java.util.ArrayList;
 import java.util.Date;

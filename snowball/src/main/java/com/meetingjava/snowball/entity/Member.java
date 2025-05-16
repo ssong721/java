@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import com.meetingjava.snowball.entity.Meeting;
 
 import lombok.Builder;
 import lombok.Getter;
