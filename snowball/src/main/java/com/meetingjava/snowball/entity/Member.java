@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import com.meetingjava.snowball.entity.Meeting;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +18,6 @@ public class Member {
     private LocalDate joinedAt;
     private double attendanceRate;
     private List<Feedback> feedbacks;
-    private List<Badge> badges;
     private Role role;
 
     public double getAttendaceRate() {
@@ -37,10 +37,6 @@ public class Member {
 
     public LocalDate getJoinedDate() {
         return this.joinedAt;
-    }
-
-    public List<Badge> getBadges() {
-        return this.badges;
     }
 
     public void setRole(Role role) {
