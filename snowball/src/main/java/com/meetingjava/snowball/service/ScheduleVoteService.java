@@ -3,6 +3,7 @@ package com.meetingjava.snowball.service;
 import com.meetingjava.snowball.entity.ScheduleVote;
 
 import java.util.*;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ScheduleVoteService {
