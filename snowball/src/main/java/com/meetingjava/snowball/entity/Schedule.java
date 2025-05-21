@@ -3,6 +3,7 @@ package com.meetingjava.snowball.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 public class Schedule {
@@ -53,12 +54,24 @@ public class Schedule {
         this.startTime = startTime;
     }
 
+     public String getStart() {
+        return scheduleDate
+            .atTime(startTime)
+            .format(DateTimeFormatter.ISO_DATE_TIME);
+    }
+
     public LocalTime getEndTime() {
         return endTime;
     }
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+    public String getEnd() {
+        return scheduleDate
+            .atTime(endTime)
+            .format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
     public boolean isOverlapping(Schedule other) {
