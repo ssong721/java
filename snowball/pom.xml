@@ -35,7 +35,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
+		<!-- Spring Security -->
+    	<dependency>
+        	<groupId>org.springframework.boot</groupId>
+        	<artifactId>spring-boot-starter-security</artifactId>
+    	</dependency>
 
+    	<!-- 비밀번호 암호화를 위한 Spring Security Crypto -->
+    	<dependency>
+        	<groupId>org.springframework.security</groupId>
+        	<artifactId>spring-security-crypto</artifactId>
+    	</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
