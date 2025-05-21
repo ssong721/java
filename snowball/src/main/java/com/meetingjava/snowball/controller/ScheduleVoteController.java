@@ -1,9 +1,10 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.entity.ScheduleVote;
-import com.meetingjava.snowball.service.ScheduleVoteService;;
+import com.meetingjava.snowball.service.ScheduleVoteService;
 
 import java.util.*;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/schedule-vote")
