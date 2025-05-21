@@ -1,4 +1,4 @@
-package main.java.com.meetingjava.snowball.entity;
+package com.meetingjava.snowball.entity;
 
 import java.util.Objects;
 
