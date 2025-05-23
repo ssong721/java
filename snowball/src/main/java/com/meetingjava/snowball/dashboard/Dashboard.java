@@ -1,3 +1,13 @@
+package com.meetingjava.snowball.dashboard;
+
+import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.entity.Check;
+import com.meetingjava.snowball.service.StaticService;
+import com.meetingjava.snowball.dashboard.Summary;
+import java.util.Date;
+import org.springframework.stereotype.Component;
+
+
 @Component
 public class Dashboard {
     private final Schedule scheduleService;
