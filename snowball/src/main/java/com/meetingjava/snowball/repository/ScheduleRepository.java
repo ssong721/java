@@ -1,11 +1,16 @@
-// ScheduleRepository.java
 package com.meetingjava.snowball.repository;
 
 import com.meetingjava.snowball.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.time.LocalDate;
+import java.util.Optional;
+
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
-    // 필요 시 커스텀 쿼리 추가 가능
+
+    // 오늘 일정
+    Optional<Schedule> findByMeetingIdAndScheduleDate(String meetingId, LocalDate date);
+
+    // 다가오는 가장 빠른 일정
+    Optional<Schedule> findFirstByMeetingIdAndScheduleDateAfterOrderByScheduleDateAsc(String meetingId, LocalDate date);
 }
