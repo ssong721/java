@@ -46,3 +46,5 @@ public class Check {
         this.rate = rate;
     }
 }
+
+System.out.println("Check class real updated");
