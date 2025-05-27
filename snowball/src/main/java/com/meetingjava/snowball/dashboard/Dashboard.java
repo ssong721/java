@@ -1,16 +1,15 @@
 package com.meetingjava.snowball.dashboard;
 
-import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.entity.Check;
+import com.meetingjava.snowball.service.ScheduleService;  // ✅ ScheduleService import
 import com.meetingjava.snowball.service.StaticService;
-import com.meetingjava.snowball.dashboard.Summary;
 import java.util.Date;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class Dashboard {
-    private final Schedule scheduleService;
+
+    private final ScheduleService scheduleService;  // ✅ ScheduleService로 수정
     private final StaticService staticService;
     private final Check checkService;
 
@@ -20,7 +19,7 @@ public class Dashboard {
     private Date upcomingMeeting;
     private Date todayMeeting;
 
-    public Dashboard(Schedule scheduleService,
+    public Dashboard(ScheduleService scheduleService,
                      StaticService staticService,
                      Check checkService) {
         this.scheduleService = scheduleService;
@@ -38,10 +37,14 @@ public class Dashboard {
         }
 
         this.attendanceRate = staticService.calculateAttendanceRate(meeting);
-        this.totalMeetingCount = staticService.getMonthlyMeetingCounts().stream().mapToInt(Integer::intValue).sum();
+        this.totalMeetingCount = staticService.getMonthlyMeetingCounts()
+                                              .stream()
+                                              .mapToInt(Integer::intValue)
+                                              .sum();
 
         staticService.getUpcomingSchedule(meeting)
             .ifPresent(s -> this.upcomingMeeting = java.sql.Date.valueOf(s.getScheduleDate()));
+
         staticService.getTodaySchedule(meeting)
             .ifPresent(s -> this.todayMeeting = java.sql.Date.valueOf(s.getScheduleDate()));
 

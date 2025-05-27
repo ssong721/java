@@ -1,9 +1,11 @@
 package com.meetingjava.snowball.service;
 
+import org.springframework.stereotype.Component;
 import com.meetingjava.snowball.entity.Schedule;
 import java.time.LocalDate;
 import java.util.*;
 
+@Component
 public class StaticService {
 
     private final List<Schedule> allSchedules;

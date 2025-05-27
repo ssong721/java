@@ -17,6 +17,9 @@ public class Schedule {
     private LocalTime startTime;
     private LocalTime endTime;
 
+    // ✅ 추가: meetingId 필드
+    private String meetingId;
+
     public Schedule() {}
 
     public Schedule(String scheduleName, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime) {
@@ -54,7 +57,7 @@ public class Schedule {
         this.startTime = startTime;
     }
 
-     public String getStart() {
+    public String getStart() {
         return scheduleDate
             .atTime(startTime)
             .format(DateTimeFormatter.ISO_DATE_TIME);
@@ -72,6 +75,15 @@ public class Schedule {
         return scheduleDate
             .atTime(endTime)
             .format(DateTimeFormatter.ISO_DATE_TIME);
+    }
+
+    // ✅ 추가: meetingId getter/setter
+    public String getMeetingId() {
+        return meetingId;
+    }
+
+    public void setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
     }
 
     public boolean isOverlapping(Schedule other) {

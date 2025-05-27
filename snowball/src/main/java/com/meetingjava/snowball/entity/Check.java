@@ -1,7 +1,8 @@
 package com.meetingjava.snowball.entity;
 
-import java.util.Objects;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Check {
 
     private boolean enable;
