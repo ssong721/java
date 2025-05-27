@@ -45,6 +45,8 @@ public class Check {
     public void setRate(double rate) {
         this.rate = rate;
     }
-}
 
-System.out.println("Check class real updated");
+    public void debugPrint() {
+        System.out.println("Check class real updated"); 
+    }
+}
