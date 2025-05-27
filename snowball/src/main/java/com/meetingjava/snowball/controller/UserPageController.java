@@ -59,5 +59,11 @@ public class UserPageController {
             return "login";
         }
     }
+    
+    // 환영 페이지 보여주기 (로그인 후 리디렉션 등에서 사용)
+    @GetMapping("/welcome")
+    public String welcomePage() {
+        return "welcome";  // templates/welcome.html
+    }
 }
 

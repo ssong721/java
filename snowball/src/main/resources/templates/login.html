@@ -5,14 +5,15 @@
 </head>
 <body>
 <h2>로그인</h2>
-<form action="#" th:action="@{/login}" method="post">
+
+<form th:action="@{/login}" method="post">
     <label>아이디: <input type="text" name="username" required></label><br>
     <label>비밀번호: <input type="password" name="password" required></label><br>
     <button type="submit">로그인</button>
 </form>
 
-<div th:if="${error}">
-    <p style="color:red;" th:text="${error}"></p>
+<div th:if="${param.error}">
+    <p style="color:red;">아이디 또는 비밀번호가 잘못되었습니다.</p>
 </div>
 
 <a href="/signup">회원가입 페이지로</a>
