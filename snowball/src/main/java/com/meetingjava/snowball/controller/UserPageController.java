@@ -10,10 +10,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 
 import com.meetingjava.snowball.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
+
 import com.meetingjava.snowball.entity.User;
 
 @Controller
-@SessionAttributes("name") // name을 세션에 저장
 public class UserPageController {
 
     private final UserService userService;
@@ -57,27 +59,27 @@ public class UserPageController {
     @PostMapping("/login")
     public String login(@RequestParam String username,
                         @RequestParam String password,
-                        Model model) {
+                        Model model,
+                        HttpSession session) {
         try {
             User user = userService.login(username, password);
+            session.setAttribute("loginUser", user); // ← 세션에 저장!
             model.addAttribute("name", user.getName());
-            return "welcome";  // 로그인 성공 페이지
+            return "redirect:/home";  // 로그인 성공 후 홈으로 이동
         } catch (Exception e) {
             model.addAttribute("error", "로그인 실패: " + e.getMessage());
             return "login";
         }
     }
     
-    // 환영 페이지 보여주기 (로그인 후 리디렉션 등에서 사용)
-   @GetMapping("/welcome")
-    public String welcomePage(@ModelAttribute(value = "name", binding = false) String name, Model model) {
-    if (name == null || name.isBlank()) {
-        return "redirect:/login"; // 세션 없으면 로그인으로 돌려보냄
+    //홈화면으로 연결
+    @GetMapping("/home")
+    public String homePage(HttpSession session, Model model) {
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser != null) {
+            model.addAttribute("username", loginUser.getName()); // 프론트에서 쓰기 위한 이름
+        }
+        return "home"; // home.html 렌더링
     }
-    model.addAttribute("name", name);
-        return "welcome";
-    }
-
-
 }
 
