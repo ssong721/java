@@ -17,7 +17,7 @@ public class Schedule {
     private LocalTime startTime;
     private LocalTime endTime;
 
-    // ✅ 추가: meetingId 필드
+    // 추가: meetingId 필드
     private String meetingId;
 
     public Schedule() {}
@@ -77,7 +77,7 @@ public class Schedule {
             .format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
-    // ✅ 추가: meetingId getter/setter
+    // 추가: meetingId getter/setter
     public String getMeetingId() {
         return meetingId;
     }

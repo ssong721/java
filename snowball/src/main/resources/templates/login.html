@@ -13,8 +13,25 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
+
+   html, body {
+        height: 100%;
+        margin: 0;
+        background-color: black; /* 바깥 배경 */
+    }
+
+    .form-signin {
+        background-color: white;   /* 가운데 콘텐츠 배경 */
+        min-height: 100vh;         /* 화면 높이만큼 */
+    }
+
+    .form-floating {
+      margin-top: 10px;
+      margin-bottom: 10px
+    }
+
 </style>
-<main class="form-signin m-auto" style="max-width: 500px; padding-top: 50px;">
+<main class="form-signin m-auto" style="max-width: 500px; padding-top: 50px; padding-left: 20px; padding-right: 20px">
   <form th:action="@{/login}" method="post">
     <h1 class="h3 mb-3 fw-normal text-center">로그인</h1>
 
