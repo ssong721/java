@@ -20,8 +20,8 @@ public class ScheduleVoteService {
 
     @Autowired
     public ScheduleVoteService(ScheduleVoteRepository voteRepository,
-            RestTemplate restTemplate,
-            ObjectMapper objectMapper) {
+                               RestTemplate restTemplate,
+                               ObjectMapper objectMapper) {
         this.voteRepository = voteRepository;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
@@ -75,6 +75,7 @@ public class ScheduleVoteService {
                         new TypeReference<List<Date>>() {
                         });
                 vote.parseGPTResponse(recommendedSlots);
+                vote.calculateAvailableUsers();
                 voteRepository.save(vote);
             } else {
                 System.out.println("Gemini 호출 실패: " + response.getStatusCode());
@@ -92,14 +93,27 @@ public class ScheduleVoteService {
         voteRepository.save(vote);
     }
 
-    // ✅ 상세 조회
-    public ScheduleVote getVote(String voteId) {
-        return getVoteOrThrow(voteId);
+    // ✅ voteId로 단일 조회 (JSON 출력용)
+    public ScheduleVote findById(String voteId) {
+        return voteRepository.findById(voteId)
+                .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
     }
 
-    // 내부 공통 메서드
+    // ✅ 전체 조회 (voteId 목록 확인용)
+    public List<ScheduleVote> findAll() {
+        return voteRepository.findAll();
+    }
+
+    // ✅ 내부 공통 조회 메서드
     private ScheduleVote getVoteOrThrow(String voteId) {
         return voteRepository.findById(voteId)
                 .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
     }
+
+    // ✅ 단일 투표 조회 메서드 (직관적 이름)
+    public ScheduleVote getVote(String voteId) {
+        return voteRepository.findById(voteId)
+                .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
+    }
+
 }
