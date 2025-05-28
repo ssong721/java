@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>시간 투표하기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(24, 1fr);
+            width: 100%;
+            height: 480px;
+            border: 1px solid #ccc;
+        }
+
+        .grid div {
+            border: 1px solid #eee;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .grid div.selected {
+            background-color: #444;
+        }
+
+        .floating-box {
+            background-color: white;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .top-right-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .hour-label {
+            font-size: 12px;
+            height: 20px;
+        }
+
+        .day-label {
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body style="background-color: white; color: black;">
+<div class="floating-box">
+    <div class="d-flex justify-content-between align-items-center">
+        <h5 style="text-align: center; font-weight: bold;">시간 투표하기</h5>
+        <button class="btn btn-dark btn-sm">링크 복사</button>
+    </div>
+
+    <h6 class="mt-4" th:text="${meetingName}">모임 이름</h6>
+    <p th:text="${scheduleTitle}">정기 모임 일정 가능 시간</p>
+
+    <!-- 시간 라벨 + 요일 라벨 + 셀 -->
+    <div style="display: flex;">
+        <!-- 시간 라벨 -->
+        <div style="display: flex; flex-direction: column; margin-right: 4px;">
+            <div style="height: 20px;"></div>
+            <div th:each="h : ${#numbers.sequence(0, 23)}" class="hour-label">
+                <span th:text="${h}"></span>
+            </div>
+        </div>
+
+        <!-- 요일 헤더 + 셀 -->
+        <div style="flex-grow: 1;">
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 2px;">
+                <div class="day-label">월</div><div class="day-label">화</div><div class="day-label">수</div>
+                <div class="day-label">목</div><div class="day-label">금</div><div class="day-label">토</div>
+                <div class="day-label">일</div>
+            </div>
+            <div class="grid" id="voteGrid">
+                <th:block th:each="i : ${#numbers.sequence(1,168)}">
+                    <div></div>
+                </th:block>
+            </div>
+            <button id="submitVoteBtn" class="btn btn-primary mt-4">투표 제출</button>
+        </div>
+    </div>
+
+    <p class="mt-4"><strong>정기 모임 추천 시간</strong><br>화요일 18시</p>
+    <p><strong>가능한 모임원</strong><br>박준서, 조우영, 변지민 (3명)</p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const voteGrid = document.getElementById('voteGrid');
+        const cells = voteGrid.querySelectorAll('div');
+
+        // 선택 토글
+        cells.forEach((cell, index) => {
+            cell.dataset.index = index; // 각 셀에 index 저장
+            cell.addEventListener('click', () => {
+                cell.classList.toggle('selected');
+            });
+        });
+
+        // 투표 제출
+        document.getElementById('submitVoteBtn').addEventListener('click', () => {
+            const selectedIndexes = Array.from(voteGrid.querySelectorAll('.selected'))
+                .map(cell => parseInt(cell.dataset.index));
+
+            const selectedTimes = selectedIndexes.map(i => {
+                const hour = i % 24;
+                const day = Math.floor(i / 24); // 0=월, 1=화, ...
+                const baseDate = new Date(); // 기준 날짜 (오늘 기준)
+                baseDate.setDate(baseDate.getDate() - baseDate.getDay() + 1 + day); // 월요일 시작
+                baseDate.setHours(hour, 0, 0, 0);
+                return baseDate.toISOString();
+            });
+
+            const voteId = '1234'; // 실제 voteId는 백에서 넘겨받거나 URL에서 추출
+            const data = {
+                user: "변지민", // 로그인 정보로부터 가져오는 게 맞음
+                selectedTimes: selectedTimes
+            };
+
+            fetch(`/api/schedule-vote/${voteId}/vote`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('투표가 성공적으로 제출되었습니다!');
+                } else {
+                    alert('제출 실패 ㅠㅠ');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
