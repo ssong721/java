@@ -5,4 +5,3 @@ import com.meetingjava.snowball.entity.Meeting;
 
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 }
-

@@ -1,4 +1,4 @@
-package com.meetingjava.snowball.DTO;
+package com.meetingjava.snowball.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +13,4 @@ public class LoginRequest {
     private String password;
     // getters/setters
 
-} 
+}
