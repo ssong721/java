@@ -26,13 +26,13 @@ public class MeetingService {
     }
 
     public List<HomeDto> getHomesForUser(String username) {
-        List<Meeting> meetings = meetingRepository.findByHostUsername(username);
+        List<Meeting> meetings = meetingRepository.findByMemberUsername(username);
         return meetings.stream().map(meeting -> {
             HomeDto dto = new HomeDto();
-            dto.setName(meeting.getName());
+            dto.setName(meeting.getMeetingName());
             dto.setMemberCount(meeting.getMembers().size());
-            dto.setDayAndTime(meeting.getDay() + " " + meeting.getTime());
-            dto.setIsManager(meeting.getHost().getUsername().equals(username));
+            dto.setIsManager(meeting.getHostUser().equals(username));
+
             return dto;
         }).collect(Collectors.toList());
     }

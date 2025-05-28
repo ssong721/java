@@ -1,6 +1,7 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.entity.Meeting;
+import com.meetingjava.snowball.entity.User;
 import com.meetingjava.snowball.service.MeetingService;
 
 import jakarta.servlet.http.HttpSession;
@@ -49,14 +50,27 @@ public class MeetingController {
         return "newmeeting";  // newmeeting.html
     }
 
+    //홈화면으로 연결
     @GetMapping("/home")
-    public String showHome(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        String username = userDetails.getUsername();
+    public String homePage(Model model, 
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        HttpSession session) {
+        if (userDetails != null) {
+            String username = userDetails.getUsername();
 
-        List<HomeDto> homes = meetingService.getHomesForUser(username);
-        model.addAttribute("homes", homes);
+            // 이름 정보도 같이 담기 (세션에서 가져오거나 UserDetails에서 직접 가져오기)
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser != null) {
+                model.addAttribute("username", loginUser.getName());
+            } else {
+                model.addAttribute("username", username); // fallback
+            }
 
-        return "home";  // home.html 템플릿
+            // 사용자 관련 홈 정보 조회
+            List<HomeDto> homes = meetingService.getHomesForUser(username);
+            model.addAttribute("homes", homes);
+        }
+
+        return "home";
     }
-
 }
