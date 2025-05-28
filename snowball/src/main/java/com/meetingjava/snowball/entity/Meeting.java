@@ -10,8 +10,11 @@ public class Meeting {
     private String meetingId;
 
     private String meetingName;
+    @ManyToOne
+    @JoinColumn(name = "host_id")
     private String hostUser;
 
+    @OneToMany(mappedBy = "meeting")
     @ElementCollection // List도 JPA가 저장할 수 있도록 설정
     private List<String> members;
 

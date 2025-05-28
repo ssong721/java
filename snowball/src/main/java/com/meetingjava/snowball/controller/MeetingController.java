@@ -6,6 +6,7 @@ import com.meetingjava.snowball.service.MeetingService;
 import jakarta.servlet.http.HttpSession;
 
 import com.meetingjava.snowball.dto.Meetingdto;
+import com.meetingjava.snowball.dto.HomeDto;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.meetingjava.snowball.repository.MeetingRepository;
+import org.springframework.ui.Model;
+import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -45,4 +48,15 @@ public class MeetingController {
     public String CreateMeetingForm() {
         return "newmeeting";  // newmeeting.html
     }
+
+    @GetMapping("/home")
+    public String showHome(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+
+        List<HomeDto> homes = meetingService.getHomesForUser(username);
+        model.addAttribute("homes", homes);
+
+        return "home";  // home.html 템플릿
+    }
+
 }
