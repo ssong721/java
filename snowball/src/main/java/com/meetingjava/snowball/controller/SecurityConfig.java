@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 이 줄을 맨 위로 변경
                 .authorizeHttpRequests(auth -> auth
                         // 회원가입/정적 리소스 허용
-                        .requestMatchers("/signup", "/login", "/home", "/meetings/create", "/css/**", "/js/**")
+                        .requestMatchers("/signup", "/login", "/home", "/newmeeting", "/css/**", "/js/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form

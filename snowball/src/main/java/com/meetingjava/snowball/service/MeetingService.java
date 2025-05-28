@@ -15,8 +15,10 @@ public class MeetingService {
         this.meetingRepository = meetingRepository;
     }
 
-    public Meeting createMeeting(String meetingName, String hostUser, Date startDate) {
-        Meeting meeting = new Meeting(meetingName, hostUser, startDate);
+    public Meeting createMeeting(String meetingName, String hostUsername) {
+        Date now = new Date(); // 현재 시간
+
+        Meeting meeting = new Meeting(meetingName, hostUsername, now);
         return meetingRepository.save(meeting);
     }
 
