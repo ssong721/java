@@ -1,33 +1,40 @@
 package com.meetingjava.snowball.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import jakarta.persistence.*;
+import java.util.*;
 
+@Entity
 public class ScheduleVote {
 
-    private final String voteId;
+    @Id
+    private String voteId;
+
+    private Long meetingId;
     private Date startTime;
     private Date endTime;
     private int durationMinutes;
-    private Map<String, List<Date>> votes;
-    private List<Date> aiRecommendedSlots;
     private Date confirmedTime;
     private boolean isVotingClosed;
-    private boolean isRecurring;
 
-    public ScheduleVote(Date startTime, Date endTime, int durationMinutes, boolean isRecurring) {
+    // 👉 JPA가 저장 불가한 필드는 임시로 제외
+    @Transient
+    private Map<String, List<Date>> votes = new HashMap<>();
+
+    @Transient
+    private List<Date> aiRecommendedSlots = new ArrayList<>();
+
+    // ✅ 기본 생성자 (JPA용)
+    public ScheduleVote() {
+    }
+
+    // ✅ 커스텀 생성자
+    public ScheduleVote(Date startTime, Date endTime, int durationMinutes, Long meetingId) {
         this.voteId = UUID.randomUUID().toString();
         this.startTime = startTime;
         this.endTime = endTime;
         this.durationMinutes = durationMinutes;
-        this.votes = new HashMap<>();
-        this.aiRecommendedSlots = new ArrayList<>();
         this.isVotingClosed = false;
-        this.isRecurring = isRecurring;
+        this.meetingId = meetingId;
     }
 
     public void startVoting() {
@@ -51,10 +58,12 @@ public class ScheduleVote {
             sb.append("{ \"user\": \"").append(entry.getKey()).append("\", \"times\": [");
             for (int j = 0; j < entry.getValue().size(); j++) {
                 sb.append("\"").append(entry.getValue().get(j)).append("\"");
-                if (j < entry.getValue().size() - 1) sb.append(", ");
+                if (j < entry.getValue().size() - 1)
+                    sb.append(", ");
             }
             sb.append("]}");
-            if (i < votes.size() - 1) sb.append(", ");
+            if (i < votes.size() - 1)
+                sb.append(", ");
             i++;
         }
         sb.append("], \"durationMinutes\": ").append(durationMinutes).append(" }");
@@ -69,9 +78,24 @@ public class ScheduleVote {
         this.confirmedTime = time;
     }
 
+    // ✅ Getter들
+    public String getVoteId() {
+        return voteId;
+    }
 
-    public String getVoteId() { return voteId; }
-    public List<Date> getAiRecommendedSlots() { return aiRecommendedSlots; }
-    public boolean isVotingClosed() { return isVotingClosed; }
-    public Date getConfirmedTime() { return confirmedTime; }
+    public Long getMeetingId() {
+        return meetingId;
+    }
+
+    public List<Date> getAiRecommendedSlots() {
+        return aiRecommendedSlots;
+    }
+
+    public boolean isVotingClosed() {
+        return isVotingClosed;
+    }
+
+    public Date getConfirmedTime() {
+        return confirmedTime;
+    }
 }

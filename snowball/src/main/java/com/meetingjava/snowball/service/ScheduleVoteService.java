@@ -1,49 +1,105 @@
 package com.meetingjava.snowball.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meetingjava.snowball.entity.ScheduleVote;
+import com.meetingjava.snowball.repository.ScheduleVoteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ScheduleVoteService {
-    private final Map<String, ScheduleVote> voteMap = new HashMap<>();
 
-    public ScheduleVote createVote(Date start, Date end, int duration, boolean isRecurring) {
-        ScheduleVote vote = new ScheduleVote(start, end, duration, isRecurring);
-        voteMap.put(vote.getVoteId(), vote);
-        return vote;
+    private final ScheduleVoteRepository voteRepository;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public ScheduleVoteService(ScheduleVoteRepository voteRepository,
+            RestTemplate restTemplate,
+            ObjectMapper objectMapper) {
+        this.voteRepository = voteRepository;
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
+    // ✅ 투표 생성
+    public ScheduleVote createVote(Date start, Date end, int durationMinutes, Long meetingId) {
+        ScheduleVote vote = new ScheduleVote(start, end, durationMinutes, meetingId);
+        return voteRepository.save(vote); // DB에 저장
+    }
+
+    // ✅ 투표 시작
     public void startVoting(String voteId) {
-        voteMap.get(voteId).startVoting();
+        ScheduleVote vote = getVoteOrThrow(voteId);
+        vote.startVoting();
+        voteRepository.save(vote);
     }
 
+    // ✅ 투표 제출
     public void submitVote(String voteId, String user, List<Date> selectedTimes) {
-        voteMap.get(voteId).submitVote(user, selectedTimes);
+        ScheduleVote vote = getVoteOrThrow(voteId);
+        vote.submitVote(user, selectedTimes);
+        voteRepository.save(vote);
     }
 
+    // ✅ 투표 마감
     public void closeVoting(String voteId) {
-        voteMap.get(voteId).closeVoting();
+        ScheduleVote vote = getVoteOrThrow(voteId);
+        vote.closeVoting();
+        voteRepository.save(vote);
     }
 
-    public void recommendUsingGPT(String voteId) {
-        ScheduleVote vote = voteMap.get(voteId);
-        String json = vote.prepareVoteDataForGPT();
+    // ✅ Gemini API 연동
+    public void recommendUsingGemini(String voteId) {
+        ScheduleVote vote = getVoteOrThrow(voteId);
 
-        // GPT에 API 요청 (간단한 예시, 실제 API 연동 필요)
-        List<Date> dummyResponse = new ArrayList<>();
-        dummyResponse.add(new Date(System.currentTimeMillis() + 3600000)); // +1시간
-        dummyResponse.add(new Date(System.currentTimeMillis() + 7200000)); // +2시간
+        try {
+            String geminiApiUrl = "https://your-gemini-api.com/recommend";
+            String jsonBody = vote.prepareVoteDataForGPT();
 
-        vote.parseGPTResponse(dummyResponse);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer YOUR_GEMINI_API_KEY");
+
+            HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(geminiApiUrl, request, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                List<Date> recommendedSlots = objectMapper.readValue(
+                        response.getBody(),
+                        new TypeReference<List<Date>>() {
+                        });
+                vote.parseGPTResponse(recommendedSlots);
+                voteRepository.save(vote);
+            } else {
+                System.out.println("Gemini 호출 실패: " + response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            System.out.println("Gemini 연동 중 예외 발생: " + e.getMessage());
+        }
     }
 
+    // ✅ 시간 확정
     public void confirmTime(String voteId, Date time) {
-        voteMap.get(voteId).confirmTime(time);
+        ScheduleVote vote = getVoteOrThrow(voteId);
+        vote.confirmTime(time);
+        voteRepository.save(vote);
     }
 
+    // ✅ 상세 조회
     public ScheduleVote getVote(String voteId) {
-        return voteMap.get(voteId);
+        return getVoteOrThrow(voteId);
+    }
+
+    // 내부 공통 메서드
+    private ScheduleVote getVoteOrThrow(String voteId) {
+        return voteRepository.findById(voteId)
+                .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
     }
 }
