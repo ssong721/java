@@ -1,0 +1,8 @@
+POST http://localhost:8080/meetings
+Content-Type: application/json
+
+{
+  "name": "테스트 모임",
+  "host": "junseo",
+  "startDate": "2025-06-01T18:00:00"
+}

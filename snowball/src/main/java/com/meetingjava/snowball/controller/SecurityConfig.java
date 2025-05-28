@@ -24,21 +24,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                // 회원가입/정적 리소스 허용
-                .requestMatchers("/signup", "/login", "/welcome", "/css/**", "/js/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")           // 커스텀 로그인 페이지
-                .defaultSuccessUrl("/welcome")         // 로그인 성공 시 이동 경로
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login?logout")
-                .invalidateHttpSession(true)
-            );
+                .csrf(csrf -> csrf.disable()) // 이 줄을 맨 위로 변경경
+                .authorizeHttpRequests(auth -> auth
+                        // 회원가입/정적 리소스 허용
+                        .requestMatchers("/signup", "/login", "/welcome", "/meetings/create", "/css/**", "/js/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login") // 커스텀 로그인 페이지
+                        .defaultSuccessUrl("/welcome") // 로그인 성공 시 이동 경로
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true));
 
         return http.build();
     }

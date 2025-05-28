@@ -1,50 +1,57 @@
 package com.meetingjava.snowball.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import jakarta.persistence.*;
+import java.util.*;
 
+@Entity // 이 클래스가 DB 테이블로 등록되도록 설정
 public class Meeting {
-    private final String meetingId;
+
+    @Id
+    private String meetingId;
+
     private String meetingName;
     private String hostUser;
+
+    @ElementCollection // List도 JPA가 저장할 수 있도록 설정
     private List<String> members;
-    private Date meetingStartDate; //일단 schedule(vote) 클래스에서 반환 값 받기 전에는 기본 date로 설정했습니다.
-    public Date getMeetingStartDate() {
-    return this.meetingStartDate;
-}
+
+    private Date meetingStartDate;
     private Date lastMeetingDate;
     private Date nextMeetingDate;
 
+    // ⚠️ JPA를 위한 기본 생성자 필수!
+    public Meeting() {
+        this.meetingId = UUID.randomUUID().toString();
+        this.members = new ArrayList<>();
+    }
+
     public Meeting(String meetingName, String hostUser, Date meetingStartDate) {
-        this.meetingId = UUID.randomUUID().toString();  //랜덤으로 고유 아이디 받는 것
+        this(); // 기본 생성자 호출
         this.meetingName = meetingName;
         this.hostUser = hostUser;
         this.meetingStartDate = meetingStartDate;
-        this.members = new ArrayList<>();
-        this.addMember(hostUser); //모임장 자동 등록을 하긴 했는데 필요할까요..?
+        this.addMember(hostUser); // 모임장 자동 등록
     }
 
     public void addMember(String userName) {
-        if (!members.contains(userName)) { //모임에 추가 후
+        if (!members.contains(userName)) {
             members.add(userName);
             System.out.println(userName + " 님이 모임에 추가되었습니다.");
-        } else {                           //이미 추가 돼 있는 경우
-            System.out.println(userName + " 님은 이미 참여 중입니다."); 
+        } else {
+            System.out.println(userName + " 님은 이미 참여 중입니다.");
         }
     }
 
     public void removeMember(String userName) {
-        if (!members.contains(userName)) {  //모임에 없는 사람 삭제 하려고 하는 경우
+        if (!members.contains(userName)) {
             System.out.println(userName + " 님은 모임에 없습니다.");
             return;
         }
-        if (userName.equals(hostUser)) {   //모임장은 삭제 안 되게 했는데 이것도 필요할까요..?
-            System.out.println("모임장은 삭제할 수 없습니다.");    
+        if (userName.equals(hostUser)) {
+            System.out.println("모임장은 삭제할 수 없습니다.");
             return;
         }
-        members.remove(userName);          //모임에서 삭제 후
+        members.remove(userName);
         System.out.println(userName + " 님이 모임에서 삭제되었습니다.");
     }
 
@@ -66,4 +73,35 @@ public class Meeting {
         System.out.println("다음 모임: " + (nextMeetingDate != null ? nextMeetingDate : "없음"));
         System.out.println("참여자 목록: " + members);
     }
+
+    // ✅ Getter 추가 (JPA & JSON 변환 시 필요)
+    public String getMeetingId() {
+        return meetingId;
+    }
+
+    public String getMeetingName() {
+        return meetingName;
+    }
+
+    public String getHostUser() {
+        return hostUser;
+    }
+
+    public List<String> getMembers() {
+        return members;
+    }
+
+    public Date getMeetingStartDate() {
+        return meetingStartDate;
+    }
+
+    public Date getLastMeetingDate() {
+        return lastMeetingDate;
+    }
+
+    public Date getNextMeetingDate() {
+        return nextMeetingDate;
+    }
+
+    // Setter도 필요한 만큼 추가 가능 (JPA나 컨트롤러에서 필요 시)
 }
