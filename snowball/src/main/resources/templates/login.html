@@ -35,6 +35,16 @@
     <p class="mt-5 mb-3 text-center"><a href="/signup">회원가입 페이지로</a></p>
   </form>
 </main>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  let signupSuccess = /*[[${signupSuccess}]]*/ false;
+  if (signupSuccess) {
+    alert("회원가입에 성공했습니다!");
+  }
+  /*]]>*/
+</script>
+
 </body>
 </html>
 
