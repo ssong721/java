@@ -15,7 +15,11 @@ public class Meeting {
     @ElementCollection // List도 JPA가 저장할 수 있도록 설정
     private List<String> members;
 
-    private Date meetingStartDate;
+    private Date meetingStartDate; //일단 schedule(vote) 클래스에서 반환 값 받기 전에는 기본 date로 설정했습니다.
+    public Date getMeetingStartDate() {
+        return this.meetingStartDate;
+    }
+
     private Date lastMeetingDate;
     private Date nextMeetingDate;
 
