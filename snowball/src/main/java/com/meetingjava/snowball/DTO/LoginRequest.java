@@ -1,4 +1,4 @@
-package com.meetingjava.snowball.entity;
+package com.meetingjava.snowball.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
