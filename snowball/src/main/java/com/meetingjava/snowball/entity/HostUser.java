@@ -30,3 +30,4 @@ public class HostUser {
     private String name; // 모임장 이름
     private String authorityLevel;  // 권한 수준 (예: '일반', '부회장' 등)
 }
+

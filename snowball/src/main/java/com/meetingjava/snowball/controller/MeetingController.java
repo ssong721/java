@@ -1,11 +1,13 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.entity.Meeting;
+import com.meetingjava.snowball.entity.User;
 import com.meetingjava.snowball.service.MeetingService;
 
 import jakarta.servlet.http.HttpSession;
 
 import com.meetingjava.snowball.dto.Meetingdto;
+import com.meetingjava.snowball.dto.HomeDto;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.meetingjava.snowball.repository.MeetingRepository;
+import org.springframework.ui.Model;
+import java.util.List;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -44,5 +48,29 @@ public class MeetingController {
     @GetMapping("/newmeeting")
     public String CreateMeetingForm() {
         return "newmeeting";  // newmeeting.html
+    }
+
+    //홈화면으로 연결
+    @GetMapping("/home")
+    public String homePage(Model model, 
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        HttpSession session) {
+        if (userDetails != null) {
+            String username = userDetails.getUsername();
+
+            // 이름 정보도 같이 담기 (세션에서 가져오거나 UserDetails에서 직접 가져오기)
+            User loginUser = (User) session.getAttribute("loginUser");
+            if (loginUser != null) {
+                model.addAttribute("username", loginUser.getName());
+            } else {
+                model.addAttribute("username", username); // fallback
+            }
+
+            // 사용자 관련 홈 정보 조회
+            List<HomeDto> homes = meetingService.getHomesForUser(username);
+            model.addAttribute("homes", homes);
+        }
+
+        return "home";
     }
 }

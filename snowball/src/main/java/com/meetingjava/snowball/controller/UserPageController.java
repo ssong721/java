@@ -1,5 +1,6 @@
 package com.meetingjava.snowball.controller;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import com.meetingjava.snowball.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
+import com.meetingjava.snowball.dto.HomeDto;
 import com.meetingjava.snowball.entity.User;
 
 @Controller
@@ -72,14 +74,5 @@ public class UserPageController {
         }
     }
     
-    //홈화면으로 연결
-    @GetMapping("/home")
-    public String homePage(HttpSession session, Model model) {
-        User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser != null) {
-            model.addAttribute("username", loginUser.getName()); // 프론트에서 쓰기 위한 이름
-        }
-        return "home"; // home.html 렌더링
-    }
 }
 

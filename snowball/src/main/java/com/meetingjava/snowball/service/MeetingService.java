@@ -1,10 +1,13 @@
 package com.meetingjava.snowball.service;
 
+import com.meetingjava.snowball.dto.HomeDto;
 import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.repository.MeetingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class MeetingService {
@@ -21,6 +24,19 @@ public class MeetingService {
         Meeting meeting = new Meeting(meetingName, hostUsername, now);
         return meetingRepository.save(meeting);
     }
+
+    public List<HomeDto> getHomesForUser(String username) {
+        List<Meeting> meetings = meetingRepository.findByMemberUsername(username);
+        return meetings.stream().map(meeting -> {
+            HomeDto dto = new HomeDto();
+            dto.setName(meeting.getMeetingName());
+            dto.setMemberCount(meeting.getMembers().size());
+            dto.setIsManager(meeting.getHostUser().equals(username));
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 
     // 추후 findById, findAll 등 추가 가능
 }
