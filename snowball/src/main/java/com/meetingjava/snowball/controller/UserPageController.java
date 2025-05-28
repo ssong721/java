@@ -53,7 +53,7 @@ public class UserPageController {
         try {
             User user = userService.login(username, password);
             model.addAttribute("name", user.getName());
-            return "welcome";  // 로그인 성공 페이지
+            return "redirect:/welcome";  // 로그인 성공 페이지
         } catch (Exception e) {
             model.addAttribute("error", "로그인 실패: " + e.getMessage());
             return "login";
