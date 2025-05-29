@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-SnowballApplication<snowball>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.meetingjava.snowball.SnowballApplication",
+            "projectName": "snowball",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
