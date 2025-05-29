@@ -67,14 +67,17 @@
             </div>
 
             <div th:each="home : ${homes}" class="card mb-2 p-2 d-flex flex-row align-items-center">
-                <div class="flex-grow-1">
-                    <strong th:text="${home.name}">모임명</strong>
-                    <div th:text="${home.memberCount} + '명'">5명</div>
-                    <div th:text="${home.dayAndTime}">화요일 18시</div>
-                    <div th:if="${home.isManager}" class="badge bg-secondary">관리자</div>
-                </div>
-                <div> </div>
+                <a th:href="@{|/dashboard/${home.id}|}" style="text-decoration: none; color: inherit;" class="d-flex flex-grow-1">
+                    <div class="flex-grow-1">
+                        <strong th:text="${home.name}">모임명</strong>
+                        <div th:text="${home.memberCount} + '명'">5명</div>
+                        <div th:text="${home.dayAndTime}">화요일 18시</div>
+                        <div th:if="${home.isManager}" class="badge bg-secondary">관리자</div>
+                    </div>
+                    <div></div>
+                </a>
             </div>
+
 
             <a href="/newmeeting">
                 <button class="floating-btn">+</button>

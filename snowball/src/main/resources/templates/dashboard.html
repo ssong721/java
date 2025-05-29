@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모임자바라 홈</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #ffffff;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background-color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .percentage {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .label {
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .block {
+            background-color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .notice-icon {
+            margin-right: 6px;
+        }
+    </style>
+</head>
+<body>
+    <h1>모임자바라</h1>
+
+    <div class="grid">
+        <div class="card">
+            <div class="percentage" th:text="${groupAttendanceRate + '%'}">72.5%</div>
+            <div class="label">우리 모임 출석률</div>
+        </div>
+        <div class="card">
+            <div class="percentage" th:text="${myAttendanceRate + '%'}">80.5%</div>
+            <div class="label">나의 출석률</div>
+        </div>
+    </div>
+
+    <div class="block" th:text="${nextMeeting}">다음 모임</div>
+    <div class="block" th:onclick="|location.href='@{/calendar}'|">캘린더</div>
+    <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항</span></div>
+
+    <script th:inline="javascript">
+        const meetingId = /*[[${meetingId}]]*/ 0;
+        const userId = 1; // (예시) 로그인한 사용자 ID 필요 시 넣기
+
+        fetch(`/api/dashboard/${userId}/${meetingId}`)
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('dashboard-container');
+                container.innerHTML = `
+                    <div><strong>우리 모임 출석률:</strong> ${data.groupAttendanceRate}%</div>
+                    <div><strong>나의 출석률:</strong> ${data.userAttendanceRate}%</div>
+                    <div><strong>다음 모임:</strong> ${data.nextMeeting}</div>
+                `;
+            });
+    </script>
+</body>
+</html>

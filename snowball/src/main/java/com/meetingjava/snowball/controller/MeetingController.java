@@ -14,10 +14,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import com.meetingjava.snowball.repository.MeetingRepository;
 import org.springframework.ui.Model;
 import java.util.List;
+import java.util.Optional;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -72,5 +72,17 @@ public class MeetingController {
         }
 
         return "home";
+    }
+
+    // 모임 상세 조회
+    @GetMapping("/meeting/{id}")
+    public String viewMeeting(@PathVariable String id, Model model) {
+        Optional<Meeting> meetingOpt = meetingRepository.findById(id);
+        if (meetingOpt.isPresent()) {
+            model.addAttribute("meeting", meetingOpt.get());
+            return "meetingView";
+        } else {
+            return "error/404";
+        }
     }
 }
