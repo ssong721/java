@@ -4,13 +4,13 @@ import com.meetingjava.snowball.dto.ScheduleVoteRequest;
 import com.meetingjava.snowball.entity.ScheduleVote;
 import com.meetingjava.snowball.service.ScheduleVoteService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/schedule-vote")
@@ -26,10 +26,9 @@ public class ScheduleVoteController {
     public ResponseEntity<ScheduleVote> createVote(@RequestBody ScheduleVoteRequest request) throws ParseException {
         // 날짜 + 시간 문자열을 Date 객체로 파싱
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Date start = format.parse(request.getStartDate() + " " + request.getStartTime()); // ex: 2025-06-24 10:00
-        Date end = format.parse(request.getEndDate() + " " + request.getEndTime()); // ex: 2025-06-27 22:00
+        Date start = format.parse(request.getStartDate() + " " + request.getStartTime());
+        Date end = format.parse(request.getEndDate() + " " + request.getEndTime());
 
-        // 서비스에 전달
         ScheduleVote createdVote = voteService.createVote(
                 start,
                 end,
@@ -71,7 +70,7 @@ public class ScheduleVoteController {
      */
     @PostMapping("/{voteId}/gpt")
     public ResponseEntity<Void> requestGPT(@PathVariable String voteId) {
-        voteService.recommendUsingGemini(voteId); // ✅ 메서드 이름 수정
+        voteService.recommendUsingGemini(voteId);
         return ResponseEntity.ok().build();
     }
 
@@ -84,16 +83,33 @@ public class ScheduleVoteController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * ✅ [추가된 부분] voteId로 단일 투표 조회 (JSON 확인용)
+     */
+    @GetMapping("/{voteId}")
+    public ResponseEntity<ScheduleVote> getVoteById(@PathVariable String voteId) {
+        ScheduleVote vote = voteService.findById(voteId);
+        return ResponseEntity.ok(vote);
+    }
+
+    /**
+     * ✅ [선택 사항] 전체 투표 목록 보기 (voteId들 확인용)
+     */
+    @GetMapping("/all")
+    public ResponseEntity<List<ScheduleVote>> getAllVotes() {
+        return ResponseEntity.ok(voteService.findAll());
+    }
+
     // 사용자 투표 제출용 내부 클래스
     static class VoteSubmit {
         private String user;
-        private java.util.List<Date> selectedTimes;
+        private List<Date> selectedTimes;
 
         public String getUser() {
             return user;
         }
 
-        public java.util.List<Date> getSelectedTimes() {
+        public List<Date> getSelectedTimes() {
             return selectedTimes;
         }
     }
