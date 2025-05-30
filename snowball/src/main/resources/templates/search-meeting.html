@@ -1,0 +1,91 @@
+<!-- templates/search-meeting.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>모임 검색 결과</title>
+    <style>
+         html, body {
+            height: 100%;
+            margin: 0;
+            background-color: black; /* 바깥 배경 */
+        }
+
+        .form-signin {
+            background-color: white;   /* 가운데 콘텐츠 배경 */
+            min-height: 100vh;         /* 화면 높이만큼 */
+        }
+
+        .meeting-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+        .flex-grow-1 {
+            flex-grow: 1;
+        }
+        .badge {
+            background-color: #6c757d; /* 부트스트랩 bg-secondary 색상 */
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            user-select: none;
+        }
+        button {
+            padding: 6px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <main class="form-signin" style="max-width: 500px; margin: 0 auto; padding-top: 50px; padding-left: 20px; padding-right: 20px;">
+        <h1>모임 검색 결과</h1>
+
+        <div th:if="${meetings.isEmpty()}">
+            <p>검색 결과가 없습니다.</p>
+        </div>
+
+        <div th:if="${!meetings.isEmpty()}">
+            <div th:each="meeting : ${meetings}" class="meeting-item">
+                <div class="flex-grow-1">
+                    <strong th:text="${meeting.meetingName}">모임명</strong>
+                    <!-- 멤버 수가 있다면 여기에 표시, 없다면 삭제 가능 -->
+                    <!-- <div th:text="${meeting.members.size()} + '명'">5명</div> -->
+                </div>
+
+                <!-- 가입 버튼 -->
+                <form th:action="@{/join-meeting}" method="post" style="margin-left: 15px;">
+                    <input type="hidden" name="meetingId" th:value="${meeting.meetingId}" />
+                    <button type="submit">가입</button>
+                </form>
+            </div>
+        </div>
+
+        <a th:href="@{/home}">홈으로 돌아가기</a>
+    </main>
+</body>
+</html>
+

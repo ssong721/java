@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>모임 리스트</title>
+    <title>눈덩이</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -61,19 +61,24 @@
         <div class="container">
             <h2 class="text-center mt-3">Home</h2>
 
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="찾고 싶은 모임명을 검색하세요.">
-                <span class="input-group-text">🔍</span>
-            </div>
+            <form th:action="@{/search-meeting}" method="get" class="input-group mb-3">
+                <input type="text" name="keyword" class="form-control" placeholder="찾고 싶은 모임명을 검색하세요." required>
+                <button class="input-group-text" type="submit">🔍</button>
+            </form>
 
             <div th:each="home : ${homes}" class="card mb-2 p-2 d-flex flex-row align-items-center">
                 <a th:href="@{|/dashboard/${home.id}|}" style="text-decoration: none; color: inherit;" class="d-flex flex-grow-1">
                     <div class="flex-grow-1">
                         <strong th:text="${home.name}">모임명</strong>
                         <div th:text="${home.memberCount} + '명'">5명</div>
-                        <div th:text="${home.dayAndTime}">화요일 18시</div>
-                        <div th:if="${home.isManager}" class="badge bg-secondary">관리자</div>
+
+                        <!-- 역할 뱃지: 관리자일 때 -->
+                        <div th:if="${home.manager}" class="badge bg-secondary">관리자</div>
+
+                        <!-- 역할 뱃지: 멤버일 때 -->
+                        <div th:unless="${home.manager}" class="badge bg-light text-dark">멤버</div>
                     </div>
+
                     <div></div>
                 </a>
             </div>

@@ -1,14 +1,8 @@
 package com.meetingjava.snowball.entity;
 
 // JPA 엔티티로 지정 (DB 테이블과 매핑됨)
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-// Lombok 어노테이션 (Getter, Setter, 기본 생성자 자동 생성)
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 /**
  * HostUser 엔티티 클래스
@@ -28,6 +22,7 @@ public class HostUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id; // 모임장 고유 ID
     private String name; // 모임장 이름
-    private String authorityLevel;  // 권한 수준 (예: '일반', '부회장' 등)
+    @Enumerated(EnumType.STRING) // enum을 DB에 문자열로 저장
+    private Role role;
 }
 

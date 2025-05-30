@@ -1,50 +1,47 @@
 package com.meetingjava.snowball.entity;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.ArrayList;
-
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
-import com.meetingjava.snowball.entity.Meeting;
-
-import lombok.Builder;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Member {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;  // ❗당신이 만든 User 클래스 import
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "meeting_id")
     private Meeting meeting;
-    private User user;
+
     private LocalDate joinedAt;
     private double attendanceRate;
-    private List<Feedback> feedbacks;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
 
-    public double getAttendaceRate() {
-        return this.attendanceRate;
-    }
-    
-    @Builder
-    public void submitFeedback(String content) {
-        Feedback feedback = Feedback.builder()
-                .member(this)
-                .content(content)
-                .submittedAt(LocalDate.now())
-                .build();
-
-        this.feedbacks.add(feedback);
-    }
-
-    public LocalDate getJoinedDate() {
-        return this.joinedAt;
-    }
-
-    public void setRole(Role role) {
+    // 생성자 편의 함수
+    public Member(User user, Meeting meeting, Role role) {
+        this.user = user;
+        this.meeting = meeting;
         this.role = role;
+        this.joinedAt = LocalDate.now();
+        this.attendanceRate = 0.0;
     }
 
-    public Role getRole() {
-        return this.role;
+    public boolean isHost() {
+        return this.role == Role.HOST;
     }
 
 }

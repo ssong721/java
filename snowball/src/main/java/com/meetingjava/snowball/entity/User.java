@@ -1,7 +1,10 @@
 package com.meetingjava.snowball.entity;
 
+import java.util.ArrayList;
+
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -21,4 +24,7 @@ public class User {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Member> memberList = new ArrayList<>();
 }
