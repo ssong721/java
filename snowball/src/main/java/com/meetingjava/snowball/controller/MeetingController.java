@@ -3,34 +3,41 @@ package com.meetingjava.snowball.controller;
 import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.entity.User;
 import com.meetingjava.snowball.service.MeetingService;
+import com.meetingjava.snowball.service.MemberService;
+import com.meetingjava.snowball.repository.MeetingRepository;
+import com.meetingjava.snowball.repository.UserRepository;
 
-import jakarta.servlet.http.HttpSession;
-
-import com.meetingjava.snowball.dto.Meetingdto;
 import com.meetingjava.snowball.dto.HomeDto;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import com.meetingjava.snowball.repository.MeetingRepository;
 import org.springframework.ui.Model;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import jakarta.servlet.http.HttpSession;
+
+import java.security.Principal;
+import java.util.Optional;
+import java.util.List;
 
 @Controller
 public class MeetingController {
 
     private final MeetingService meetingService;
-    @Autowired
     private MeetingRepository meetingRepository;
+    private final MemberService memberService;
+    private final UserRepository userRepository;
 
-    public MeetingController(MeetingService meetingService) {
+    public MeetingController(MeetingService meetingService,
+                             MeetingRepository meetingRepository,
+                             MemberService memberService,
+                             UserRepository userRepository) {
         this.meetingService = meetingService;
+        this.meetingRepository = meetingRepository;
+        this.memberService = memberService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/newmeeting")
@@ -85,4 +92,37 @@ public class MeetingController {
             return "error/404";
         }
     }
+
+    @GetMapping("/join-meeting")
+    public String joinMeetingForm() {
+        return "join-meeting"; // 위 HTML 파일로 이동
+    }
+
+
+    @PostMapping("/join-meeting")
+    public String joinMeeting(@RequestParam String meetingId, Principal principal, HttpSession session) {
+        // 현재 로그인된 사용자
+        String username = principal.getName();
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        Meeting meeting = meetingRepository.findById(meetingId)
+            .orElseThrow(() -> new RuntimeException("모임 없음"));
+
+        memberService.joinMeeting(user, meeting);
+
+        // 세션에 사용자 정보 업데이트 (홈에서 이름 표시를 위해)
+        session.setAttribute("loginUser", user);
+
+        return "redirect:/home";
+    }
+
+
+    @GetMapping("/search-meeting")
+    public String searchMeeting(@RequestParam("keyword") String keyword, Model model) {
+        List<Meeting> meetings = meetingRepository.findByMeetingNameContaining(keyword); // 모임 이름에 키워드 포함
+        model.addAttribute("meetings", meetings);
+        return "search-meeting"; // 위에서 만든 html
+    }
+    
 }

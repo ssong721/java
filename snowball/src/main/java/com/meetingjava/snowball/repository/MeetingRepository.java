@@ -11,6 +11,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, String> {
 
     @Query("SELECT m FROM Meeting m WHERE :username MEMBER OF m.members")
     List<Meeting> findByMemberUsername(@Param("username") String username);
-    
+    List<Meeting> findByMeetingNameContaining(String meetingName);
+    List<Meeting> findByHostUser(String hostUser);
 
 }

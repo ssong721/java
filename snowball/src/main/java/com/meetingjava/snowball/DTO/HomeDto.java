@@ -1,6 +1,6 @@
 package com.meetingjava.snowball.dto;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class HomeDto {
     private String id;

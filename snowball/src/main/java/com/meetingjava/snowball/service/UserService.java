@@ -24,7 +24,7 @@ public class UserService implements UserDetailsService {
     }
 
     String encodedPassword = passwordEncoder.encode(password);
-    User user = new User(null, username, encodedPassword, name);
+    User user = new User(null, username, encodedPassword, name, null);
     userRepository.save(user);
 }
 
