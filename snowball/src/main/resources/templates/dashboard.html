@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모임자바라 홈</title>
+    <title>대시보드</title>
     <style>
          html, body {
             height: 100%;
@@ -61,7 +61,7 @@
 </head>
 <body>
     <main class="form-signin" style="max-width: 500px; margin: 0 auto; padding-top: 50px; padding-left: 20px; padding-right: 20px;">
-        <h1>모임자바라</h1>
+        <h1 th:text="${meetingName}">모임자바라</h1>
 
         <div class="grid">
             <div class="card">

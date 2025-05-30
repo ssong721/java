@@ -30,6 +30,11 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
+    public Meeting findById(String meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElse(null);  // 없으면 null 반환 (원하는 대로 수정 가능)
+    }
+
     public List<HomeDto> getHomesForUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("유저 없음"));
