@@ -21,19 +21,19 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
         .card {
             background-color: #e0e0e0;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 32px;
+            border-radius: 16px;
             text-align: center;
         }
 
         .percentage {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
         }
 
@@ -45,6 +45,15 @@
         .block {
             background-color: #e0e0e0;
             padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .next-meeting {
+            padding: 24px;
+            font-size: 18px;
+            background-color: #e0e0e0;
             border-radius: 10px;
             margin-bottom: 10px;
             font-size: 16px;
@@ -69,8 +78,17 @@
         </div>
     </div>
 
-    <div class="block" th:text="${nextMeeting}">다음 모임</div>
-    <div class="block" th:onclick="|location.href='@{/calendar}'|">캘린더</div>
+    <div class="next-meeting">
+        <div class="title">다음 모임</div>
+        <div class="dashboard-content" th:text="${nextMeeting}">6월 5일 오후 6시 청파스터디룸</div>
+    </div>
+    
+    <div class="block">
+        <div class="dashboard-title">📅 캘린더 📅</div>
+        <ul id="event-list">
+            <li>불러오는 중...</li>
+        </ul>
+    </div>
     <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항</span></div>
 
     <script th:inline="javascript">
