@@ -1,7 +1,8 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.service.DashboardService;
-import com.meetingjava.snowball.dto.DashboardResponse;
+import com.meetingjava.snowball.service.MeetingService;
+import com.meetingjava.snowball.service.NoticeService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,13 +10,47 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.ui.Model;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardViewController {
 
+    private final DashboardService dashboardService;
+    private final MeetingService meetingService;
+    private final NoticeService noticeService;
+
+    public DashboardViewController(DashboardService dashboardService,
+                                   MeetingService meetingService,
+                                   NoticeService noticeService) {
+        this.dashboardService = dashboardService;
+        this.meetingService = meetingService;
+        this.noticeService = noticeService;
+    }
+
     @GetMapping("/{meetingId}")
-    public String dashboardPage(@PathVariable Long meetingId, Model model) {
-        model.addAttribute("meetingId", meetingId); // JS에서 API 호출용으로 사용
-        return "dashboard"; // dashboard.html 렌더링
+    public String dashboardPage(@PathVariable String meetingId,
+                                Model model,
+                                @AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+
+        // 1) 모임 존재 여부 체크 및 정보 조회 (필요하면)
+        // Meeting meeting = meetingService.findById(meetingId);
+
+        // 2) 출석률 및 다음 모임, 공지사항 등 데이터 조회
+        double groupAttendanceRate = dashboardService.getGroupAttendanceRate(meetingId);
+        double myAttendanceRate = dashboardService.getUserAttendanceRate(username, meetingId);
+        String nextMeeting = dashboardService.getNextMeetingInfo(meetingId);
+        String noticeTitle = noticeService.getLatestNoticeTitle(meetingId);
+
+        // 3) 모델에 데이터 넣기
+        model.addAttribute("meetingId", meetingId);
+        model.addAttribute("groupAttendanceRate", groupAttendanceRate);
+        model.addAttribute("myAttendanceRate", myAttendanceRate);
+        model.addAttribute("nextMeeting", nextMeeting);
+        model.addAttribute("noticeTitle", noticeTitle);
+
+        return "dashboard";
     }
 }
