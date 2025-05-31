@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모임자바라 홈</title>
+    <title>대시보드</title>
     <style>
-        body {
+         html, body {
+            height: 100%;
             margin: 0;
-            padding: 20px;
-            font-family: 'Helvetica Neue', sans-serif;
-            background-color: #ffffff;
+            background-color: black; /* 바깥 배경 */
+        }
+
+        .form-signin {
+            background-color: white;   /* 가운데 콘텐츠 배경 */
+            min-height: 100vh;         /* 화면 높이만큼 */
         }
 
         h1 {
@@ -65,31 +69,23 @@
     </style>
 </head>
 <body>
-    <h1>모임자바라</h1>
+    <main class="form-signin" style="max-width: 500px; margin: 0 auto; padding-top: 50px; padding-left: 20px; padding-right: 20px;">
+        <h1 th:text="${meetingName}">모임자바라</h1>
 
-    <div class="grid">
-        <div class="card">
-            <div class="percentage" th:text="${groupAttendanceRate + '%'}">72.5%</div>
-            <div class="label">우리 모임 출석률</div>
+        <div class="grid">
+            <div class="card">
+                <div class="percentage" th:text="${groupAttendanceRate + '%'}">72.5%</div>
+                <div class="label">우리 모임 출석률</div>
+            </div>
+            <div class="card">
+                <div class="percentage" th:text="${myAttendanceRate + '%'}">80.5%</div>
+                <div class="label">나의 출석률</div>
+            </div>
         </div>
-        <div class="card">
-            <div class="percentage" th:text="${myAttendanceRate + '%'}">80.5%</div>
-            <div class="label">나의 출석률</div>
-        </div>
-    </div>
-
-    <div class="next-meeting">
-        <div class="title">다음 모임</div>
-        <div class="dashboard-content" th:text="${nextMeeting}">6월 5일 오후 6시 청파스터디룸</div>
-    </div>
-    
-    <div class="block">
-        <div class="dashboard-title">📅 캘린더 📅</div>
-        <ul id="event-list">
-            <li>불러오는 중...</li>
-        </ul>
-    </div>
-    <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항</span></div>
+        <div class="block" th:text="${nextMeeting}">다음 모임</div>
+        <div class="block" th:onclick="|location.href='@{/calendar}'|">캘린더</div>
+        <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항</span></div>
+    </main>
 
     <script th:inline="javascript">
         const meetingId = /*[[${meetingId}]]*/ 0;
