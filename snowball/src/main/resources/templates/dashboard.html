@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대시보드</title>
+
+ <!-- CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+
+
     <style>
          html, body {
             height: 100%;
@@ -66,6 +74,16 @@
         .notice-icon {
             margin-right: 6px;
         }
+
+        .calendar {
+            background-color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            min-height: 350px; 
+        }
+
     </style>
 </head>
 <body>
@@ -82,8 +100,9 @@
                 <div class="label">나의 출석률</div>
             </div>
         </div>
+    
         <div class="block" th:text="${nextMeeting}">다음 모임</div>
-        <div class="block" th:onclick="|location.href='@{/calendar}'|">캘린더</div>
+        <div id="calendar" class="calendar">이번 달 일정</div>
         <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항</span></div>
     </main>
 
@@ -91,16 +110,34 @@
         const meetingId = /*[[${meetingId}]]*/ 0;
         const userId = 1; // (예시) 로그인한 사용자 ID 필요 시 넣기
 
-        fetch(`/api/dashboard/${userId}/${meetingId}`)
-            .then(res => res.json())
-            .then(data => {
-                const container = document.getElementById('dashboard-container');
-                container.innerHTML = `
-                    <div><strong>우리 모임 출석률:</strong> ${data.groupAttendanceRate}%</div>
-                    <div><strong>나의 출석률:</strong> ${data.userAttendanceRate}%</div>
-                    <div><strong>다음 모임:</strong> ${data.nextMeeting}</div>
+    fetch(`/api/dashboard/${userId}/${meetingId}`)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('dashboard-container');
+            container.innerHTML = `
+                <div><strong>우리 모임 출석률:</strong> ${data.groupAttendanceRate}%</div>
+                <div><strong>나의 출석률:</strong> ${data.userAttendanceRate}%</div>
+                <div><strong>다음 모임:</strong> ${data.nextMeeting}</div>
                 `;
             });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            if (!calendarEl) {
+                console.log("❌ calendar element not found!");
+                return;
+            }
+        
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                height: 'auto', 
+                events: '/api/calendar/full-events/2025/6'
+            });
+        
+            calendar.render();
+        });
+        </script>
 </body>
 </html>

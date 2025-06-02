@@ -3,10 +3,13 @@ package com.meetingjava.snowball.controller;
 import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.entity.Calendar;
+
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import com.meetingjava.snowball.dto.ScheduleEventdto;
 
 @RestController
 @RequestMapping("/api/calendar")
@@ -19,22 +22,31 @@ public class CalendarController {
     }
 
     /**
-     * 1) 특정 연·월의 스케줄 전체 조회
+     * FullCalendar 전용: 특정 연·월 스케줄 (title, start, end만 포함)
+     * GET /api/calendar/full-events/{year}/{month}
+     */
+    @GetMapping("/full-events/{year}/{month}") 
+    public List<ScheduleEventdto> getFullCalendarEvents(@PathVariable int year,
+                                                         @PathVariable int month) {
+        List<Schedule> schedules = calendar.getScheduleForMonth(year, month);
+
+        return schedules.stream()
+            .map(s -> new ScheduleEventdto(
+                s.getScheduleName(),
+                s.getStart(),
+                s.getEnd()
+            ))
+            .toList();
+    }
+
+    /**
+     * 백엔드 내부 로직용: Schedule 전체 내려줌 (엔티티 통째로)
      * GET /api/calendar/events/{year}/{month}
      */
     @GetMapping("/events/{year}/{month}")
     public List<Schedule> getMonthEvents(@PathVariable int year,
                                          @PathVariable int month) {
         return calendar.getScheduleForMonth(year, month);
-    }
-
-    /**
-     * 2) 오늘 날짜의 미팅만 조회
-     * GET /api/calendar/meetings/today
-     */
-    @GetMapping("/meetings/today")
-    public List<Meeting> getTodayMeetings() {
-        return calendar.getTodayMeeting();
     }
 
     /**
@@ -58,3 +70,5 @@ public class CalendarController {
         calendar.rescheduleMeeting(id, dt);
     }
 }
+
+
