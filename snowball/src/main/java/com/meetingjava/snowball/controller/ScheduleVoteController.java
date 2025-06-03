@@ -2,6 +2,7 @@ package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.dto.ScheduleVoteRequest;
 import com.meetingjava.snowball.entity.ScheduleVote;
+import com.meetingjava.snowball.service.GeminiService;
 import com.meetingjava.snowball.service.ScheduleVoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ScheduleVoteController {
 
     private final ScheduleVoteService voteService;
+    private final GeminiService geminiService;
 
     /**
      * 일정 투표 생성
@@ -69,9 +71,15 @@ public class ScheduleVoteController {
      * Gemini 추천 요청
      */
     @PostMapping("/{voteId}/gpt")
-    public ResponseEntity<Void> requestGPT(@PathVariable String voteId) {
-        voteService.recommendUsingGemini(voteId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<String> requestGPT(@PathVariable String voteId) {
+        // 1. voteId로 투표 데이터 조회 (예시로 문자열 구성)
+        String voteSummary = voteService.getVoteSummaryForGemini(voteId);
+
+        // 2. Gemini에 추천 시간 요청
+        String recommendedTime = geminiService.getRecommendedTime(voteSummary);
+
+        // 3. 결과를 문자열로 응답
+        return ResponseEntity.ok(recommendedTime);
     }
 
     /**
