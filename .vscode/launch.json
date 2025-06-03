@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "SnowballApplication",
+            "request": "launch",
+            "mainClass": "com.meetingjava.snowball.SnowballApplication",
+            "projectName": ""
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-SnowballApplication<snowball>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

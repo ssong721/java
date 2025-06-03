@@ -9,8 +9,4 @@ class SnowballApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
-}run:
-
-Importing projects, check
-details
+}

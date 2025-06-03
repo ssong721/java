@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meetingjava.snowball.entity.ScheduleVote;
 import com.meetingjava.snowball.repository.ScheduleVoteRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -12,25 +15,17 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ScheduleVoteService {
 
     private final ScheduleVoteRepository voteRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Autowired
-    public ScheduleVoteService(ScheduleVoteRepository voteRepository,
-                               RestTemplate restTemplate,
-                               ObjectMapper objectMapper) {
-        this.voteRepository = voteRepository;
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
-    }
-
     // ✅ 투표 생성
     public ScheduleVote createVote(Date start, Date end, int durationMinutes, Long meetingId) {
         ScheduleVote vote = new ScheduleVote(start, end, durationMinutes, meetingId);
-        return voteRepository.save(vote); // DB에 저장
+        return voteRepository.save(vote);
     }
 
     // ✅ 투표 시작
@@ -54,17 +49,23 @@ public class ScheduleVoteService {
         voteRepository.save(vote);
     }
 
+    // ✅ Gemini API 요청용 JSON 요약
+    public String getVoteSummaryForGemini(String voteId) {
+        ScheduleVote vote = getVoteOrThrow(voteId);
+        return vote.prepareVoteDataForGPT(); // 엔티티 내부 메서드
+    }
+
     // ✅ Gemini API 연동
     public void recommendUsingGemini(String voteId) {
         ScheduleVote vote = getVoteOrThrow(voteId);
 
         try {
-            String geminiApiUrl = "https://your-gemini-api.com/recommend";
+            String geminiApiUrl = "https://your-gemini-api.com/recommend"; // TODO: 실제 API URL로 변경
             String jsonBody = vote.prepareVoteDataForGPT();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer YOUR_GEMINI_API_KEY");
+            headers.set("Authorization", "Bearer YOUR_GEMINI_API_KEY"); // TODO: 실제 키로 변경
 
             HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
             ResponseEntity<String> response = restTemplate.postForEntity(geminiApiUrl, request, String.class);
@@ -93,13 +94,13 @@ public class ScheduleVoteService {
         voteRepository.save(vote);
     }
 
-    // ✅ voteId로 단일 조회 (JSON 출력용)
+    // ✅ 단일 조회
     public ScheduleVote findById(String voteId) {
         return voteRepository.findById(voteId)
                 .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
     }
 
-    // ✅ 전체 조회 (voteId 목록 확인용)
+    // ✅ 전체 목록
     public List<ScheduleVote> findAll() {
         return voteRepository.findAll();
     }
@@ -110,10 +111,8 @@ public class ScheduleVoteService {
                 .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
     }
 
-    // ✅ 단일 투표 조회 메서드 (직관적 이름)
+    // ✅ 직관적 단일 조회
     public ScheduleVote getVote(String voteId) {
-        return voteRepository.findById(voteId)
-                .orElseThrow(() -> new NoSuchElementException("해당 voteId 없음: " + voteId));
+        return getVoteOrThrow(voteId);
     }
-
 }
