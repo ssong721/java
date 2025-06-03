@@ -36,7 +36,7 @@ public class DashboardService {
                 })
                 .toList();
 
-        String noticeTitle = noticeService.getLatestNoticeTitle(String.valueOf(meetingId));
+        String noticeTitle = "공지사항 없음";
 
         return new DashboardResponse(groupRate, nextMeeting, calendarList, noticeTitle);
     }

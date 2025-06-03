@@ -5,7 +5,6 @@ import com.meetingjava.snowball.entity.Meeting;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.LocalDateTime;

@@ -121,23 +121,17 @@
                 `;
             });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const calendarEl = document.getElementById('calendar');
-            if (!calendarEl) {
-                console.log("❌ calendar element not found!");
-                return;
-            }
-        
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'ko',
-                height: 'auto', 
-                events: '/api/calendar/full-events/2025/6'
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+              initialView: 'dayGridMonth',
+              initialDate: '2025-06-01',
+              locale: 'ko',
             });
-        
             calendar.render();
-        });
+          });
         </script>
 </body>
 </html>

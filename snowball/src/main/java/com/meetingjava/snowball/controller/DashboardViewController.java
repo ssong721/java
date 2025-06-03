@@ -14,6 +14,13 @@ import org.springframework.ui.Model;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.meetingjava.snowball.dto.ScheduleEventdto;
+import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.service.ScheduleService;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardViewController {
@@ -21,20 +28,38 @@ public class DashboardViewController {
     private final DashboardService dashboardService;
     private final MeetingService meetingService;
     private final NoticeService noticeService;
+    private final ScheduleService scheduleService;
+    
 
     public DashboardViewController(DashboardService dashboardService,
                                    MeetingService meetingService,
-                                   NoticeService noticeService) {
+                                   NoticeService noticeService,
+                                   ScheduleService scheduleService) {
         this.dashboardService = dashboardService;
         this.meetingService = meetingService;
         this.noticeService = noticeService;
+        this.scheduleService = scheduleService;
     }
+
+    @GetMapping("/api/calendar/full-events/{year}/{month}")
+@ResponseBody
+public List<ScheduleEventdto> getFullCalendarEvents(@PathVariable int year,
+                                                     @PathVariable int month) {
+    List<Schedule> schedules = scheduleService.getSchedulesByMonth(year, month);
+    return schedules.stream()
+            .map(s -> new ScheduleEventdto(
+                    s.getScheduleName(),
+                    s.getStart(),
+                    s.getEnd()
+            )).toList();
+}
 
     @GetMapping("/{meetingId}")
     public String dashboardPage(@PathVariable String meetingId,
                                 Model model,
                                 @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
+        System.out.println("대시보드 요청 도착: " + meetingId);
 
         // 1) 모임 존재 여부 체크 및 정보 조회 (필요하면)
         Meeting meeting = meetingService.findById(meetingId);
