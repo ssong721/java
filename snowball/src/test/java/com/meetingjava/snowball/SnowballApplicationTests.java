@@ -10,4 +10,7 @@ class SnowballApplicationTests {
 	void contextLoads() {
 	}
 
-}
+}run:
+
+Importing projects, check
+details
