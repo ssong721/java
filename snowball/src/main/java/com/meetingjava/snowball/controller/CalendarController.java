@@ -11,6 +11,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import com.meetingjava.snowball.dto.ScheduleEventdto;
 
+import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.dto.ScheduleEventdto;
+
+
 @RestController
 @RequestMapping("/api/calendar")
 public class CalendarController {
@@ -70,5 +74,3 @@ public class CalendarController {
         calendar.rescheduleMeeting(id, dt);
     }
 }
-
-
