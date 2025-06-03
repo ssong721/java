@@ -9,7 +9,7 @@ public class ScheduleVote {
     @Id
     private String voteId;
 
-    private Long meetingId;
+    private String meetingId;
     private Date startTime;
     private Date endTime;
     private int durationMinutes;
@@ -37,7 +37,7 @@ public class ScheduleVote {
     }
 
     // ✅ 생성자
-    public ScheduleVote(Date startTime, Date endTime, int durationMinutes, Long meetingId) {
+    public ScheduleVote(Date startTime, Date endTime, int durationMinutes, String meetingId) {
         this.voteId = UUID.randomUUID().toString();
         this.startTime = startTime;
         this.endTime = endTime;
@@ -113,7 +113,7 @@ public class ScheduleVote {
         return voteId;
     }
 
-    public Long getMeetingId() {
+    public String getMeetingId() {
         return meetingId;
     }
 

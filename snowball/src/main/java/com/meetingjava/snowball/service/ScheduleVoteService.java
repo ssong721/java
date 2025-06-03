@@ -22,8 +22,13 @@ public class ScheduleVoteService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
+    public ScheduleVote findByMeetingId(String meetingId) {
+        return voteRepository.findByMeetingId(meetingId)
+            .orElseThrow(() -> new NoSuchElementException("해당 meetingId에 대한 투표 없음: " + meetingId));
+    }
+
     // ✅ 투표 생성
-    public ScheduleVote createVote(Date start, Date end, int durationMinutes, Long meetingId) {
+    public ScheduleVote createVote(Date start, Date end, int durationMinutes, String meetingId) {
         ScheduleVote vote = new ScheduleVote(start, end, durationMinutes, meetingId);
         return voteRepository.save(vote);
     }
