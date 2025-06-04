@@ -142,18 +142,32 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('calendar');
-        if (!calendarEl) return;
+    var calendarEl = document.getElementById('calendar');
+    if (!calendarEl) {
+      console.log("❌ calendar element not found!");
+      return;
+    }
 
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'ko',
-            height: 'auto',
-            events: '/api/calendar/full-events/2025/6'
-        });
-
-        calendar.render();
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'ko',
+      height: 'auto',
+      initialDate: '2025-06-01',  // 기본 날짜
+      events: [  // ✅ 여기를 정적 데이터로!
+        {
+          title: '예시 일정 1',
+          start: '2025-06-10'
+        },
+        {
+          title: '예시 일정 2',
+          start: '2025-06-15',
+          end: '2025-06-17'
+        }
+      ]
     });
+
+    calendar.render();
+  });
 </script>
 </body>
 </html>
