@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>대시보드</title>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+    <!-- CDN 테스트 -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/locales-all.min.js'></script>
     <style>
         html, body {
             height: 100%;
@@ -117,7 +119,7 @@
     </div>
 
     <div class="block" th:text="${nextMeeting}">예정된 모임이 없습니다.</div>
-    <div id="calendar" class="calendar">이번 달 일정</div>
+    <div id="calendar" class="calendar"></div>
     <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항이 없습니다.</span></div>
 </main>
 
@@ -161,13 +163,13 @@
       locale: 'ko',
       height: 'auto',
       initialDate: '2025-06-01',  // 기본 날짜
-      events: [  // ✅ 여기를 정적 데이터로!
+      events: [  // 여기를 정적 데이터로!
         {
-          title: '예시 일정 1',
+          title: '학생회 회의',
           start: '2025-06-10'
         },
         {
-          title: '예시 일정 2',
+          title: '아이데이션',
           start: '2025-06-15',
           end: '2025-06-17'
         }
