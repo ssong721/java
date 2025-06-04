@@ -1,38 +1,43 @@
 package com.meetingjava.snowball.service;
 
 import com.meetingjava.snowball.dto.HomeDto;
+import com.meetingjava.snowball.entity.Member;
+import com.meetingjava.snowball.entity.Meeting;
+import com.meetingjava.snowball.entity.User;
 import com.meetingjava.snowball.repository.MeetingRepository;
 import com.meetingjava.snowball.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import com.meetingjava.snowball.entity.*;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.stream.Collectors;
 import java.util.List;
 
 @Service
 public class MeetingService {
 
     private final MeetingRepository meetingRepository;
-    private final UserRepository userRepository; // 추가
+    private final UserRepository userRepository;
 
     public MeetingService(MeetingRepository meetingRepository, UserRepository userRepository) {
         this.meetingRepository = meetingRepository;
         this.userRepository = userRepository;
     }
 
-
     public Meeting createMeeting(String meetingName, String hostUsername) {
-        Date now = new Date(); // 현재 시간
-
+        Date now = new Date();
         Meeting meeting = new Meeting(meetingName, hostUsername, now);
         return meetingRepository.save(meeting);
     }
 
     public Meeting findById(String meetingId) {
         return meetingRepository.findById(meetingId)
-                .orElse(null);  // 없으면 null 반환 (원하는 대로 수정 가능)
+                .orElse(null);
+    }
+
+    public String getMeetingNameById(String meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new RuntimeException("해당 meetingId 없음: " + meetingId))
+                .getMeetingName();
     }
 
     public List<HomeDto> getHomesForUser(String username) {
@@ -41,7 +46,6 @@ public class MeetingService {
 
         List<HomeDto> homes = new ArrayList<>();
 
-        // ✅ 1. 멤버로 참여한 모임들
         for (Member member : user.getMemberList()) {
             Meeting meeting = member.getMeeting();
 
@@ -50,12 +54,11 @@ public class MeetingService {
             dto.setName(meeting.getMeetingName());
             dto.setDayAndTime(meeting.getMeetingStartDate());
             dto.setMemberCount(meeting.getMembers().size());
-            dto.setIsManager(meeting.getHostUser().equals(username)); // 이건 false일 것
+            dto.setIsManager(meeting.getHostUser().equals(username));
 
             homes.add(dto);
         }
 
-        // ✅ 2. 호스트로 만든 모임들 (이미 멤버로 포함된 경우 중복 제거)
         List<Meeting> hostedMeetings = meetingRepository.findByHostUser(username);
         for (Meeting meeting : hostedMeetings) {
             boolean alreadyAdded = homes.stream()
@@ -66,7 +69,7 @@ public class MeetingService {
                 dto.setName(meeting.getMeetingName());
                 dto.setDayAndTime(meeting.getMeetingStartDate());
                 dto.setMemberCount(meeting.getMembers().size());
-                dto.setIsManager(true); // ✅ 호스트니까 true로 설정
+                dto.setIsManager(true);
 
                 homes.add(dto);
             }
@@ -74,6 +77,4 @@ public class MeetingService {
 
         return homes;
     }
-
-    // 추후 findById, findAll 등 추가 가능
-}
+} 

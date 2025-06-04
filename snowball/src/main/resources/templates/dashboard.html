@@ -2,26 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대시보드</title>
-
- <!-- CSS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
-
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
-
-
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
     <style>
-         html, body {
+        html, body {
             height: 100%;
             margin: 0;
-            background-color: black; /* 바깥 배경 */
+            background-color: black;
         }
 
         .form-signin {
-            background-color: white;   /* 가운데 콘텐츠 배경 */
-            min-height: 100vh;         /* 화면 높이만큼 */
+            background-color: white;
+            min-height: 100vh;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 50px 20px 80px;
+            position: relative;
         }
 
         h1 {
@@ -62,76 +59,101 @@
             font-size: 16px;
         }
 
-        .next-meeting {
-            padding: 24px;
-            font-size: 18px;
-            background-color: #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-        }
-
-        .notice-icon {
-            margin-right: 6px;
-        }
-
         .calendar {
             background-color: #e0e0e0;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 10px;
             font-size: 16px;
-            min-height: 350px; 
+            min-height: 350px;
         }
 
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 500px;
+            height: 60px;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #ccc;
+            z-index: 100;
+        }
+
+        .nav-link {
+            flex: 1;
+            text-align: center;
+            color: #333;
+            text-decoration: none;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
-    <main class="form-signin" style="max-width: 500px; margin: 0 auto; padding-top: 50px; padding-left: 20px; padding-right: 20px;">
-        <h1 th:text="${meetingName}">모임자바라</h1>
+<main class="form-signin">
+    <h1 th:text="${meetingName}">모임 이름</h1>
 
-        <div class="grid">
-            <div class="card">
-                <div class="percentage" th:text="${groupAttendanceRate + '%'}">72.5%</div>
-                <div class="label">우리 모임 출석률</div>
-            </div>
-            <div class="card">
-                <div class="percentage" th:text="${myAttendanceRate + '%'}">80.5%</div>
-                <div class="label">나의 출석률</div>
-            </div>
+    <div class="grid">
+        <div class="card">
+            <div class="percentage" th:text="${groupAttendanceRate + '%'}">0.0%</div>
+            <div class="label">우리 모임 출석률</div>
         </div>
-    
-        <div class="block" th:text="${nextMeeting}">다음 모임</div>
-        <div id="calendar" class="calendar">이번 달 일정</div>
-        <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항</span></div>
-    </main>
+        <div class="card">
+            <div class="percentage" th:text="${myAttendanceRate + '%'}">0.0%</div>
+            <div class="label">나의 출석률</div>
+        </div>
+    </div>
 
-    <script th:inline="javascript">
-        const meetingId = /*[[${meetingId}]]*/ 0;
-        const userId = 1; // (예시) 로그인한 사용자 ID 필요 시 넣기
+    <div class="block" th:text="${nextMeeting}">예정된 모임이 없습니다.</div>
+    <div id="calendar" class="calendar">이번 달 일정</div>
+    <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항이 없습니다.</span></div>
+</main>
+
+<!-- ✅ 하단 네비게이션 바 -->
+<nav class="nav">
+    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}">
+        <div>🕒</div><div>일정 투표</div>
+    </a>
+    <a class="nav-link" href="#"><div>✅</div><div>일정 확정</div></a>
+    <a class="nav-link" href="#"><div>📋</div><div>출석 확인</div></a>
+</nav>
+
+<script th:inline="javascript">
+    const meetingId = /*[[${meetingId}]]*/ 0;
+    const userId = 1;
 
     fetch(`/api/dashboard/${userId}/${meetingId}`)
         .then(res => res.json())
         .then(data => {
             const container = document.getElementById('dashboard-container');
-            container.innerHTML = `
-                <div><strong>우리 모임 출석률:</strong> ${data.groupAttendanceRate}%</div>
-                <div><strong>나의 출석률:</strong> ${data.userAttendanceRate}%</div>
-                <div><strong>다음 모임:</strong> ${data.nextMeeting}</div>
+            if (container) {
+                container.innerHTML = `
+                    <div><strong>우리 모임 출석률:</strong> ${data.groupAttendanceRate}%</div>
+                    <div><strong>나의 출석률:</strong> ${data.userAttendanceRate}%</div>
+                    <div><strong>다음 모임:</strong> ${data.nextMeeting}</div>
                 `;
-            });
-    </script>
+            }
+        });
+</script>
 
-        <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-              initialView: 'dayGridMonth',
-              initialDate: '2025-06-01',
-              locale: 'ko',
-            });
-            calendar.render();
-          });
-        </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            height: 'auto',
+            events: '/api/calendar/full-events/2025/6'
+        });
+
+        calendar.render();
+    });
+</script>
 </body>
 </html>

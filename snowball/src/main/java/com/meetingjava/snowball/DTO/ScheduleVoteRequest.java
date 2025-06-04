@@ -6,7 +6,7 @@ public class ScheduleVoteRequest {
     private String endDate;
     private String endTime;
     private int durationMinutes;
-    private Long meetingId;
+    private String meetingId;
 
     // ✅ Getters and setters
     public String getStartDate() { return startDate; }
@@ -24,6 +24,6 @@ public class ScheduleVoteRequest {
     public int getDurationMinutes() { return durationMinutes; }
     public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
 
-    public Long getMeetingId() { return meetingId; }
-    public void setMeetingId(Long meetingId) { this.meetingId = meetingId; }
+    public String getMeetingId() { return meetingId; }
+    public void setMeetingId(String meetingId) { this.meetingId = meetingId; }
 }
