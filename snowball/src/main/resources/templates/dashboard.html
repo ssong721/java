@@ -95,6 +95,17 @@
 </head>
 <body>
 <main class="form-signin">
+    <a th:href="@{/home}" style="
+        text-decoration: none;
+        color: black;
+        font-size: 24px;
+        padding: 4px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f0f0f0;
+    ">
+        ←
+    </a>
     <h1 th:text="${meetingName}">모임 이름</h1>
 
     <div class="grid">
