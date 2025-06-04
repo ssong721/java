@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>일정 생성</title>
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background-color: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      font-size: 20px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    input[type="date"], select {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .time-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .time-group select {
+      flex: 1;
+    }
+
+    .divider {
+      text-align: center;
+      margin: 12px 0;
+      color: #888;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #ccc;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      margin-top: 16px;
+      cursor: not-allowed;
+    }
+
+    button:enabled {
+      background-color: #4CAF50;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>일정 생성</h2>
+
+    <form th:action="@{/api/schedule/submit}" method="post" id="scheduleForm">
+      <label>일정 후보 날짜를 선택해주세요.</label>
+      <input type="date" id="startDate" name="startDate"> ~
+      <input type="date" id="endDate" name="endDate">
+
+      <label>일정 후보 시간을 선택해주세요.</label>
+      <div class="time-group">
+        <select id="startHour" name="startHour"><option>10</option><option>11</option></select>
+        <select id="startMin" name="startMin"><option>00</option><option>30</option></select>
+        <select id="startAMPM" name="startAMPM"><option>AM</option><option>PM</option></select>
+      </div>
+
+      <div class="divider">~</div>
+
+      <div class="time-group">
+        <select id="endHour" name="endHour"><option>10</option><option>11</option></select>
+        <select id="endMin" name="endMin"><option>00</option><option>30</option></select>
+        <select id="endAMPM" name="endAMPM"><option>AM</option><option>PM</option></select>
+      </div>
+
+      <button id="submitBtn" type="submit" disabled>만들기</button>
+    </form>
+  </div>
+
+  <script>
+    const requiredIds = [
+      'startDate', 'endDate',
+      'startHour', 'startMin', 'startAMPM',
+      'endHour', 'endMin', 'endAMPM'
+    ];
+
+    requiredIds.forEach(id => {
+      document.getElementById(id).addEventListener('change', checkAllFieldsFilled);
+    });
+
+    function checkAllFieldsFilled() {
+      const allFilled = requiredIds.every(id => document.getElementById(id).value !== '');
+      document.getElementById('submitBtn').disabled = !allFilled;
+    }
+  </script>
+</body>
+</html>
+
