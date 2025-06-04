@@ -14,6 +14,7 @@ public class GeminiService {
 
     @Value("${gemini.api.key}") // ✅ application.properties에서 키 불러오기
     private String apiKey;
+
     private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
     private final RestTemplate restTemplate;
 
@@ -25,6 +26,7 @@ public class GeminiService {
     public String getRecommendedTime(String voteData) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + apiKey); // ✅ 추가된 부분
 
         String prompt = "다음은 모임원들의 시간 투표 결과입니다. 가장 많은 인원이 가능한 추천 일정을 알려줘:\n" + voteData;
 

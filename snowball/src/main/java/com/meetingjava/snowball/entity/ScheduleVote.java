@@ -16,21 +16,16 @@ public class ScheduleVote {
     private Date confirmedTime;
     private boolean isVotingClosed;
 
-    private Date recommendedTime;  // ✅ AI 추천 시간
-
-    @ElementCollection
-    private List<String> availableUsers = new ArrayList<>(); // ✅ 가능한 인원
-
-    // ✅ 투표 내역을 DB에 저장하도록 변경
-    @ElementCollection
-    @CollectionTable(name = "vote_submission", joinColumns = @JoinColumn(name = "vote_id"))
-    @MapKeyColumn(name = "user_name")
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "selected_time")
-    private Map<String, List<Date>> votes = new HashMap<>();
+    private Date recommendedTime;  // ✅ Gemini 추천 시간
 
     @Transient
-    private List<Date> aiRecommendedSlots = new ArrayList<>();
+    private List<String> availableUsers = new ArrayList<>();
+
+    @Transient
+    private Map<String, List<Date>> votes = new HashMap<>(); // ✅ DB에 저장하지 않고 메모리에서만 사용
+
+    @Transient
+    private List<Date> aiRecommendedSlots = new ArrayList<>(); // Gemini 응답 전체 보관
 
     // ✅ 기본 생성자
     public ScheduleVote() {
@@ -51,7 +46,7 @@ public class ScheduleVote {
         this.isVotingClosed = false;
     }
 
-    // ✅ 투표 제출
+    // ✅ 투표 제출 (메모리 구조에만 추가 — DB는 VoteSubmission에 저장됨)
     public void submitVote(String userName, List<Date> selectedTimes) {
         if (!isVotingClosed) {
             votes.put(userName, selectedTimes);
@@ -107,7 +102,7 @@ public class ScheduleVote {
         this.confirmedTime = time;
     }
 
-    // ✅ Getters
+    // ✅ Getters & Setters
 
     public String getVoteId() {
         return voteId;
@@ -151,5 +146,9 @@ public class ScheduleVote {
 
     public Map<String, List<Date>> getVotes() {
         return votes;
+    }
+
+    public void setVotes(Map<String, List<Date>> votes) {
+        this.votes = votes;
     }
 }
