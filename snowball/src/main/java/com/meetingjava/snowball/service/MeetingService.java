@@ -6,7 +6,9 @@ import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.entity.User;
 import com.meetingjava.snowball.repository.MeetingRepository;
 import com.meetingjava.snowball.repository.UserRepository;
+import com.meetingjava.snowball.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import com.meetingjava.snowball.entity.Role;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,16 +19,26 @@ public class MeetingService {
 
     private final MeetingRepository meetingRepository;
     private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
-    public MeetingService(MeetingRepository meetingRepository, UserRepository userRepository) {
+    public MeetingService(MeetingRepository meetingRepository, UserRepository userRepository, MemberRepository memberRepository) {
         this.meetingRepository = meetingRepository;
         this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
     }
 
     public Meeting createMeeting(String meetingName, String hostUsername) {
         Date now = new Date();
         Meeting meeting = new Meeting(meetingName, hostUsername, now);
-        return meetingRepository.save(meeting);
+        meetingRepository.save(meeting);
+
+        User user = userRepository.findByUsername(hostUsername)
+        .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        Member hostMember = new Member(user, meeting, Role.HOST);
+        memberRepository.save(hostMember);
+
+        return meeting;
     }
 
     public Meeting findById(String meetingId) {
@@ -53,7 +65,7 @@ public class MeetingService {
             dto.setId(meeting.getMeetingId());
             dto.setName(meeting.getMeetingName());
             dto.setDayAndTime(meeting.getMeetingStartDate());
-            dto.setMemberCount(meeting.getMembers().size());
+            dto.setMemberCount(memberRepository.countByMeeting(meeting));
             dto.setIsManager(meeting.getHostUser().equals(username));
 
             homes.add(dto);

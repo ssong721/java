@@ -15,6 +15,9 @@ public class Meeting {
     @ElementCollection // List도 JPA가 저장할 수 있도록 설정
     private List<String> members;
 
+    @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Member> memberList = new ArrayList<>();
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date meetingStartDate; //일단 schedule(vote) 클래스에서 반환 값 받기 전에는 기본 date로 설정했습니다.
 
@@ -91,6 +94,10 @@ public class Meeting {
 
     public List<String> getMembers() {
         return members;
+    }
+
+    public List<Member> getMemberList() {
+        return memberList;
     }
 
     public Date getMeetingStartDate() {

@@ -30,7 +30,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
+    
     // 생성자 편의 함수
     public Member(User user, Meeting meeting, Role role) {
         this.user = user;
