@@ -123,6 +123,14 @@
         <button id="gptBtn" class="btn btn-secondary">추천 시간 요청</button>
     </div>
 
+    <!-- 전체 투표 결과 보기 버튼 -->
+    <div class="text-center mt-3">
+        <a th:href="@{'/schedulevote/result/' + ${meetingId}}">
+            <button class="btn btn-outline-dark">전체 투표 결과 보기</button>
+        </a>
+    </div>
+
+
     <!-- 결과 영역 -->
     <div class="result-section">
         <p><strong>모임 추천 시간</strong><br>

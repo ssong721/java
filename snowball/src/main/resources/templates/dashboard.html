@@ -115,11 +115,18 @@
 
 <!-- ✅ 하단 네비게이션 바 -->
 <nav class="nav">
-    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}">
+    <a class="nav-link" href="#">
+        <div>🗓️</div><div>일정 생성</div>
+    </a>
+    <a class="nav-link" th:href="@{'/schedulevote/' + ${meetingId}}">
         <div>🕒</div><div>일정 투표</div>
     </a>
-    <a class="nav-link" href="#"><div>✅</div><div>일정 확정</div></a>
-    <a class="nav-link" href="#"><div>📋</div><div>출석 확인</div></a>
+    <a class="nav-link" href="#">
+        <div>📋</div><div>출석 확인</div>
+    </a>
+    <a class="nav-link" href="#">
+        <div>👥</div><div>인원</div>
+    </a>
 </nav>
 
 <script th:inline="javascript">
@@ -152,8 +159,8 @@
       initialView: 'dayGridMonth',
       locale: 'ko',
       height: 'auto',
-      initialDate: '2025-06-01',  // 기본 날짜
-      events: [  // ✅ 여기를 정적 데이터로!
+      initialDate: '2025-06-01',
+      events: [
         {
           title: '예시 일정 1',
           start: '2025-06-10'
