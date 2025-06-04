@@ -100,9 +100,6 @@
         color: black;
         font-size: 24px;
         padding: 4px 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #f0f0f0;
     ">
         ←
     </a>
@@ -126,11 +123,11 @@
 
 <!-- ✅ 하단 네비게이션 바 -->
 <nav class="nav">
-    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}">
-        <div>🕒</div><div>일정 투표</div>
+    <a class="nav-link" href="#">
+        <div>📋</div><div>일정 생성</div>
     </a>
-    <a class="nav-link" href="#"><div>✅</div><div>일정 확정</div></a>
-    <a class="nav-link" href="#"><div>📋</div><div>출석 확인</div></a>
+    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}"><div>📋</div><div>일정 투표</div></a>
+    <a class="nav-link" href="#"><div>✅</div><div>출석 확인</div></a>
 </nav>
 
 <script th:inline="javascript">
