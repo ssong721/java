@@ -10,7 +10,9 @@ public class Meeting {
     private String meetingId;
 
     private String meetingName;
-    private String hostUser;
+    @ManyToOne
+    @JoinColumn(name = "host_user_id")
+    private User hostUser;
 
     @ElementCollection // List도 JPA가 저장할 수 있도록 설정
     private List<String> members;
@@ -30,12 +32,12 @@ public class Meeting {
         this.members = new ArrayList<>();
     }
 
-    public Meeting(String meetingName, String hostUser, Date meetingStartDate) {
+    public Meeting(String meetingName, User hostUser, Date meetingStartDate) {
         this(); // 기본 생성자 호출
         this.meetingName = meetingName;
         this.hostUser = hostUser;
         this.meetingStartDate = meetingStartDate;
-        this.addMember(hostUser); // 모임장 자동 등록
+        this.addMember(hostUser.getUsername()); // 모임장 자동 등록
     }
 
     public void addMember(String userName) {
@@ -88,7 +90,7 @@ public class Meeting {
         return meetingName;
     }
 
-    public String getHostUser() {
+    public User getHostUser() {
         return hostUser;
     }
 

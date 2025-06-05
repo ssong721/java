@@ -42,17 +42,17 @@ public class DashboardViewController {
     }
 
     @GetMapping("/api/calendar/full-events/{year}/{month}")
-@ResponseBody
-public List<ScheduleEventdto> getFullCalendarEvents(@PathVariable int year,
-                                                     @PathVariable int month) {
-    List<Schedule> schedules = scheduleService.getSchedulesByMonth(year, month);
-    return schedules.stream()
-            .map(s -> new ScheduleEventdto(
-                    s.getScheduleName(),
-                    s.getStart(),
-                    s.getEnd()
-            )).toList();
-}
+    @ResponseBody
+    public List<ScheduleEventdto> getFullCalendarEvents(@PathVariable int year,
+                                                        @PathVariable int month) {
+        List<Schedule> schedules = scheduleService.getSchedulesByMonth(year, month);
+        return schedules.stream()
+                .map(s -> new ScheduleEventdto(
+                        s.getScheduleName(),
+                        s.getStart(),
+                        s.getEnd()
+                )).toList();
+    }
 
     @GetMapping("/{meetingId}")
     public String dashboardPage(@PathVariable String meetingId,
