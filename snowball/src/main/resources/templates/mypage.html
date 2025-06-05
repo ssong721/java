@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+</head>
+<body>
+<h2>마이페이지</h2>
+
+<p><strong th:text="${name}">사용자 이름</strong></p>
+
+<a th:href="@{/logout}">로그아웃</a>
+
+<form th:action="@{/delete-account}" method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
+    <button type="submit">회원 탈퇴</button>
+</form>
+
+</body>
+</html>
+

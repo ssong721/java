@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.meetingjava.snowball.entity.Meeting;
+import com.meetingjava.snowball.entity.User;
 import java.util.List;
 
 public interface MeetingRepository extends JpaRepository<Meeting, String> {
@@ -12,6 +13,6 @@ public interface MeetingRepository extends JpaRepository<Meeting, String> {
     @Query("SELECT m FROM Meeting m WHERE :username MEMBER OF m.members")
     List<Meeting> findByMemberUsername(@Param("username") String username);
     List<Meeting> findByMeetingNameContaining(String meetingName);
-    List<Meeting> findByHostUser(String hostUser);
+    List<Meeting> findByHostUser(User hostUser);
 
 }

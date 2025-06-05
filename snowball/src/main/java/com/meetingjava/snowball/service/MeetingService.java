@@ -29,11 +29,12 @@ public class MeetingService {
 
     public Meeting createMeeting(String meetingName, String hostUsername) {
         Date now = new Date();
-        Meeting meeting = new Meeting(meetingName, hostUsername, now);
-        meetingRepository.save(meeting);
 
         User user = userRepository.findByUsername(hostUsername)
         .orElseThrow(() -> new RuntimeException("유저 없음"));
+
+        Meeting meeting = new Meeting(meetingName, user, now);
+        meetingRepository.save(meeting);
 
         Member hostMember = new Member(user, meeting, Role.HOST);
         memberRepository.save(hostMember);
@@ -66,12 +67,12 @@ public class MeetingService {
             dto.setName(meeting.getMeetingName());
             dto.setDayAndTime(meeting.getMeetingStartDate());
             dto.setMemberCount(memberRepository.countByMeeting(meeting));
-            dto.setIsManager(meeting.getHostUser().equals(username));
+            dto.setIsManager(meeting.getHostUser().getUsername().equals(username));
 
             homes.add(dto);
         }
 
-        List<Meeting> hostedMeetings = meetingRepository.findByHostUser(username);
+        List<Meeting> hostedMeetings = meetingRepository.findByHostUser(user);
         for (Meeting meeting : hostedMeetings) {
             boolean alreadyAdded = homes.stream()
                     .anyMatch(dto -> dto.getId().equals(meeting.getMeetingId()));
