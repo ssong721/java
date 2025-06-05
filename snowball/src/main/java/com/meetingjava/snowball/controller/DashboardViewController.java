@@ -29,16 +29,21 @@ public class DashboardViewController {
     private final MeetingService meetingService;
     private final NoticeService noticeService;
     private final ScheduleService scheduleService;
-    
 
     public DashboardViewController(DashboardService dashboardService,
-                                   MeetingService meetingService,
-                                   NoticeService noticeService,
-                                   ScheduleService scheduleService) {
+            MeetingService meetingService,
+            NoticeService noticeService,
+            ScheduleService scheduleService) {
         this.dashboardService = dashboardService;
         this.meetingService = meetingService;
         this.noticeService = noticeService;
         this.scheduleService = scheduleService;
+    }
+
+    // ✅ 0604 준서 추가한 코드 (기본 요청 처리용)
+    @GetMapping("")
+    public String dashboardDefaultRedirect() {
+        return "redirect:/dashboard/sample-meeting-id"; // 실제 meetingId로 수정 가능
     }
 
     @GetMapping("/api/calendar/full-events/{year}/{month}")
@@ -50,14 +55,14 @@ public class DashboardViewController {
                 .map(s -> new ScheduleEventdto(
                         s.getScheduleName(),
                         s.getStart(),
-                        s.getEnd()
-                )).toList();
+                        s.getEnd()))
+                .toList();
     }
 
     @GetMapping("/{meetingId}")
     public String dashboardPage(@PathVariable String meetingId,
-                                Model model,
-                                @AuthenticationPrincipal UserDetails userDetails) {
+            Model model,
+            @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         System.out.println("대시보드 요청 도착: " + meetingId);
 
