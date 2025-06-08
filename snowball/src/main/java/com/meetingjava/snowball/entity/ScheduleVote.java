@@ -17,6 +17,9 @@ public class ScheduleVote {
     private boolean isVotingClosed;
 
     private Date recommendedTime;  // ✅ Gemini 추천 시간
+        public void setRecommendedTime(Date time) {
+        this.recommendedTime = time;
+    }
 
     @Transient
     private List<String> availableUsers = new ArrayList<>();

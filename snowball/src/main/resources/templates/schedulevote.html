@@ -126,7 +126,7 @@
     <!-- 결과 영역 -->
     <div class="result-section">
         <p><strong>모임 추천 시간</strong><br>
-            <span th:text="${#temporals.format(recommendedTime, 'E요일 HH시')}">화요일 18시</span>
+            <span th:text="${formattedRecommendedTime}">추천 시간 없음</span>
         </p>
 
         <p><strong>가능한 인원</strong><br>

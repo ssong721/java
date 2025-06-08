@@ -1,24 +1,24 @@
 package com.meetingjava.snowball.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 
 @Service
 public class GeminiService {
 
-    @Value("${gemini.api.key}") // ✅ application.properties에서 키 불러오기
+    @Value("${gemini.api.key}")
     private String apiKey;
 
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+    @Value("${gemini.api.url}")
+    private String geminiUrl;
+
     private final RestTemplate restTemplate;
 
-    @Autowired
     public GeminiService(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
     }
@@ -26,9 +26,14 @@ public class GeminiService {
     public String getRecommendedTime(String voteData) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + apiKey); // ✅ 추가된 부분
 
-        String prompt = "다음은 모임원들의 시간 투표 결과입니다. 가장 많은 인원이 가능한 추천 일정을 알려줘:\n" + voteData;
+        String prompt = """
+            다음은 모임원들의 시간 투표 결과입니다.
+            각 사용자는 가능한 시간을 여러 개 선택했습니다.
+            가장 많은 인원이 가능한 하나의 일정을 추천해주세요.
+            ISO 8601 형식(예: 2025-06-07T18:00:00)으로 출력해줘.
+
+            """ + voteData;
 
         Map<String, Object> body = Map.of(
                 "contents", List.of(
@@ -38,7 +43,7 @@ public class GeminiService {
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                    GEMINI_URL + "?key=" + apiKey,
+                    geminiUrl + "?key=" + apiKey,
                     entity,
                     Map.class);
 
@@ -57,6 +62,6 @@ public class GeminiService {
             System.out.println("Gemini 호출 오류: " + e.getMessage());
         }
 
-        return "Gemini 추천 시간 없음 또는 오류 발생";
+        return null;
     }
 }
