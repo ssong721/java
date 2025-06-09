@@ -63,7 +63,13 @@ public class ScheduleVoteController {
     public ResponseEntity<String> requestGPT(@PathVariable String voteId) {
         String voteSummary = voteService.getVoteSummaryForGemini(voteId);
         String recommendedTime = geminiService.getRecommendedTime(voteSummary);
-        return ResponseEntity.ok(recommendedTime);
+
+        if (recommendedTime == null) {
+            return ResponseEntity.internalServerError().body("❌ Gemini 추천 실패");
+        }
+
+        voteService.updateRecommendedTime(voteId, recommendedTime); // ✅ DB에 저장
+        return ResponseEntity.ok("✅ 추천 완료");
     }
 
     // ✅ 시간 확정

@@ -125,4 +125,20 @@ public class ScheduleVoteService {
     public ScheduleVote getVote(String voteId) {
         return getVoteOrThrow(voteId);
     }
+
+        public void updateRecommendedTime(String voteId, String recommendedTimeStr) {
+        try {
+            Instant instant = Instant.parse(recommendedTimeStr);
+            Date parsedTime = Date.from(instant);
+
+            ScheduleVote vote = getVoteOrThrow(voteId);
+            vote.setRecommendedTime(parsedTime);
+            voteRepository.save(vote);
+
+            System.out.println("✅ 추천 시간 저장 완료: " + parsedTime);
+        } catch (Exception e) {
+            System.out.println("❌ 추천 시간 파싱 실패: " + recommendedTimeStr);
+        }
+    }
+
 }
