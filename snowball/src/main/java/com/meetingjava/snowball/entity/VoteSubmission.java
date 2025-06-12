@@ -10,27 +10,31 @@ public class VoteSubmission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String voteId;
     private String userName;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date selectedTime;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vote_id", referencedColumnName = "vote_id")
+    private ScheduleVote vote;
+
     public VoteSubmission() {}
 
-    public VoteSubmission(String voteId, String userName, Date selectedTime) {
-        this.voteId = voteId;
+    // ✅ voteId 없이 vote 객체만 넘김
+    public VoteSubmission(ScheduleVote vote, String userName, Date selectedTime) {
+        this.vote = vote;
         this.userName = userName;
         this.selectedTime = selectedTime;
     }
 
     public Long getId() { return id; }
-    public String getVoteId() { return voteId; }
     public String getUserName() { return userName; }
     public Date getSelectedTime() { return selectedTime; }
+    public ScheduleVote getVote() { return vote; }
 
     public void setId(Long id) { this.id = id; }
-    public void setVoteId(String voteId) { this.voteId = voteId; }
     public void setUserName(String userName) { this.userName = userName; }
     public void setSelectedTime(Date selectedTime) { this.selectedTime = selectedTime; }
+    public void setVote(ScheduleVote vote) { this.vote = vote; }
 }
