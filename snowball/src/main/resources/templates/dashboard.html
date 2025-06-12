@@ -159,7 +159,7 @@
         <div>📋</div>
         <div>일정 투표</div>
     </a>
-    <a class="nav-link" href="#">
+    <a class="nav-link" href="/check/answer">
         <div>✅</div>
         <div>출석 확인</div>
     </a>
@@ -226,7 +226,7 @@
   fetch(`/api/schedule/next?meetingId=${meetingId}`)
     .then(res => res.json())
     .then(data => {
-      const target = document.querySelector('.next-meeting .value');  // 🔥 핵심 변경
+      const target = document.querySelector('.next-meeting .value');  // 핵심 변경
       if (target) {
         if (data.meetingName && data.dateTime) {
           target.textContent = `${data.meetingName} (${data.dateTime})`;

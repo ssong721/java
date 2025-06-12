@@ -46,7 +46,16 @@ public class Check {
         this.rate = rate;
     }
 
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
     public void debugPrint() {
-        System.out.println("Check class real updated"); 
+        System.out.println("Check class real updated");
     }
 }
+

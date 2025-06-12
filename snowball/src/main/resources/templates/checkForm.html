@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 퀴즈 생성</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: white;
+      min-height: 100vh;
+    }
+    a.back-button {
+      text-decoration: none;
+      color: black;
+      font-size: 24px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 24px;
+      padding: 12px;
+      width: 100%;
+      background-color:  #2b2ee6;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-button" th:href="@{|/check/answer?meetingId=${meetingId}|}">←</a>
+    <h1>출석 퀴즈 생성</h1>
+    <form action="/check/create" method="post">
+      <label for="question">질문</label>
+      <input type="text" id="question" name="question" placeholder="예: 오늘 회장이 입은 옷 색은?" required>
+
+      <label for="answer">정답</label>
+      <input type="text" id="answer" name="answer" placeholder="예: 노랑" required>
+
+      <input type="hidden" name="meetingId" th:value="${meetingId}"/>
+
+      <button type="submit">생성하기</button>
+    </form>
+  </div>
+</body>
+</html>
+
+
