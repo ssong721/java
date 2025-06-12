@@ -120,20 +120,7 @@
 
     <div class="button-row">
         <button id="submitVoteBtn" class="btn btn-primary">투표 제출</button>
-        <button id="gptBtn" class="btn btn-secondary">추천 시간 요청</button>
-    </div>
-
-    <!-- 결과 영역 -->
-    <div class="result-section">
-        <p><strong>모임 추천 시간</strong><br>
-            <span th:text="${formattedRecommendedTime}">추천 시간 없음</span>
-        </p>
-
-        <p><strong>가능한 인원</strong><br>
-            <span th:text="${#strings.arrayJoin(availableUsers, ', ')} + ' (' + ${#lists.size(availableUsers)} + '명)'">
-                변지민 (1명)
-            </span>
-        </p>
+        <button onclick="location.href='/recommendation/'+voteId" class="btn btn-secondary">추천 시간 보기</button>
     </div>
 </main>
 
@@ -188,19 +175,6 @@
                     alert('✅ 투표가 성공적으로 제출되었습니다!');
                 } else {
                     alert('❌ 제출 실패 ㅠㅠ');
-                }
-            });
-        });
-
-        document.getElementById("gptBtn").addEventListener("click", () => {
-            fetch(`/api/schedule-vote/${voteId}/gpt`, {
-                method: 'POST'
-            }).then(response => {
-                if (response.ok) {
-                    alert("✅ 추천 요청 완료! 화면을 새로고침합니다.");
-                    location.reload();
-                } else {
-                    alert("❌ 추천 실패");
                 }
             });
         });

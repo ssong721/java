@@ -2,6 +2,7 @@ package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.dto.ScheduleVoteRequest;
 import com.meetingjava.snowball.entity.ScheduleVote;
+import com.meetingjava.snowball.entity.VoteSubmission;
 import com.meetingjava.snowball.service.GeminiService;
 import com.meetingjava.snowball.service.ScheduleVoteService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -111,5 +113,12 @@ public class ScheduleVoteController {
         public List<String> getSelectedTimes() {
             return selectedTimes;
         }
+    }
+
+    // ✅ 자체 추천 API 추가
+    @PostMapping("/{meetingId}/recommend")
+    public ResponseEntity<String> recommend(@PathVariable String meetingId) {
+        voteService.recommendBestTime(meetingId);
+        return ResponseEntity.ok("✅ 자체 추천 완료");
     }
 }

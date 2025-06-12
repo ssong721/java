@@ -11,8 +11,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -41,28 +39,25 @@ public class ScheduleVoteService {
         voteRepository.save(vote);
     }
 
-    // ✅ 투표 제출 - null 시간 방지 적용
     public void submitVote(String voteId, String user, List<String> selectedTimeStrs) {
-    List<Date> selectedDates = convertToDateList(selectedTimeStrs);
+        List<Date> selectedDates = convertToDateList(selectedTimeStrs);
 
-    if (selectedDates.isEmpty()) {
-        throw new IllegalArgumentException("❌ 유효한 시간 없음. 모든 시간 파싱 실패");
+        if (selectedDates.isEmpty()) {
+            throw new IllegalArgumentException("❌ 유효한 시간 없음. 모든 시간 파싱 실패");
+        }
+
+        ScheduleVote vote = getVoteOrThrow(voteId);
+
+        for (Date time : selectedDates) {
+            if (time == null) continue;
+            VoteSubmission submission = new VoteSubmission(vote, user, time);
+            voteSubmissionRepository.save(submission);
+        }
+
+        vote.submitVote(user, selectedDates);
+        voteRepository.save(vote);
     }
 
-    for (Date time : selectedDates) {
-        if (time == null) continue; // 혹시라도 null이 섞였을 경우 방어
-        VoteSubmission submission = new VoteSubmission(voteId, user, time);
-        voteSubmissionRepository.save(submission);
-    }
-
-    ScheduleVote vote = getVoteOrThrow(voteId);
-    vote.submitVote(user, selectedDates);
-    voteRepository.save(vote);
-}
-
-
-
-    // ✅ 시간 변환 (밀리초 포함/미포함 모두 처리)
     private List<Date> convertToDateList(List<String> timeStrs) {
         List<Date> dates = new ArrayList<>();
         for (String timeStr : timeStrs) {
@@ -76,8 +71,6 @@ public class ScheduleVoteService {
         return dates;
     }
 
-
-
     public void closeVoting(String voteId) {
         ScheduleVote vote = getVoteOrThrow(voteId);
         vote.closeVoting();
@@ -85,7 +78,7 @@ public class ScheduleVoteService {
     }
 
     public String getVoteSummaryForGemini(String voteId) {
-        List<VoteSubmission> submissions = voteSubmissionRepository.findByVoteId(voteId);
+        List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_VoteId(voteId);
         Map<String, List<Date>> voteMap = new HashMap<>();
 
         for (VoteSubmission submission : submissions) {
@@ -95,9 +88,6 @@ public class ScheduleVoteService {
 
         ScheduleVote vote = getVoteOrThrow(voteId);
         vote.setVotes(voteMap);
-
-        System.out.println("✅ Gemini voteMap: " + voteMap);
-        System.out.println("✅ Gemini JSON: " + vote.prepareVoteDataForGPT());
 
         return vote.prepareVoteDataForGPT();
     }
@@ -126,7 +116,7 @@ public class ScheduleVoteService {
         return getVoteOrThrow(voteId);
     }
 
-        public void updateRecommendedTime(String voteId, String recommendedTimeStr) {
+    public void updateRecommendedTime(String voteId, String recommendedTimeStr) {
         try {
             Instant instant = Instant.parse(recommendedTimeStr);
             Date parsedTime = Date.from(instant);
@@ -141,4 +131,63 @@ public class ScheduleVoteService {
         }
     }
 
+    public void recommendBestTime(String meetingId) {
+        ScheduleVote vote = findByMeetingId(meetingId);
+        String voteId = vote.getVoteId();
+
+        List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_VoteId(voteId);
+        Map<Date, Integer> countMap = new HashMap<>();
+
+        for (VoteSubmission submission : submissions) {
+            Date time = submission.getSelectedTime();
+            countMap.put(time, countMap.getOrDefault(time, 0) + 1);
+        }
+
+        Date bestTime = countMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        if (bestTime != null) {
+            vote.setRecommendedTime(bestTime);
+
+            List<String> availableUsers = submissions.stream()
+                    .filter(s -> s.getSelectedTime().equals(bestTime))
+                    .map(VoteSubmission::getUserName)
+                    .distinct()
+                    .toList();
+
+            vote.setAvailableUsers(availableUsers);
+            voteRepository.save(vote);
+        }
+    }
+
+    public Map<String, Object> getRecommendedTimeInfo(String meetingId) {
+        ScheduleVote vote = findByMeetingId(meetingId);
+        String voteId = vote.getVoteId();
+
+        List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_VoteId(voteId);
+        Map<Date, Integer> countMap = new HashMap<>();
+
+        for (VoteSubmission submission : submissions) {
+            Date time = submission.getSelectedTime();
+            countMap.put(time, countMap.getOrDefault(time, 0) + 1);
+        }
+
+        Date bestTime = countMap.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(null);
+
+        List<String> availableUsers = submissions.stream()
+                .filter(s -> s.getSelectedTime().equals(bestTime))
+                .map(VoteSubmission::getUserName)
+                .distinct()
+                .toList();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("recommendedTime", bestTime);
+        result.put("availableUsers", availableUsers);
+        return result;
+    }
 }

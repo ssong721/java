@@ -7,6 +7,7 @@ import java.util.*;
 public class ScheduleVote {
 
     @Id
+    @Column(name = "vote_id")  // 🔥 반드시 추가해야 함
     private String voteId;
 
     private String meetingId;
@@ -153,5 +154,9 @@ public class ScheduleVote {
 
     public void setVotes(Map<String, List<Date>> votes) {
         this.votes = votes;
+    }
+
+    public void setAvailableUsers(List<String> availableUsers) {
+        this.availableUsers = availableUsers;
     }
 }

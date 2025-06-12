@@ -1,6 +1,8 @@
 package com.meetingjava.snowball.service;
 
 import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.entity.ScheduleVote;
+import com.meetingjava.snowball.entity.VoteSubmission;
 import com.meetingjava.snowball.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class ScheduleService {
