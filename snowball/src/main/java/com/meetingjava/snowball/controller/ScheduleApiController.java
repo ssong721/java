@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,5 +69,19 @@ public class ScheduleApiController {
 
         return "redirect:/dashboard/sample-meeting-id"; // 저장 후 리다이렉트
     }
-
+    
+    // 예정된 모임 관련 추가
+    @GetMapping("/next")
+    @ResponseBody
+    public Map<String, String> getNextSchedule(@RequestParam String meetingId) {
+        return scheduleRepository
+            .findFirstByMeetingIdAndScheduleDateAfterOrderByScheduleDateAsc(meetingId, LocalDate.now())
+            .map(schedule -> {
+                Map<String, String> map = new HashMap<>();
+                map.put("meetingName", schedule.getScheduleName());
+                map.put("dateTime", schedule.getScheduleDate().toString() + " " + schedule.getStartTime().toString());
+                return map;
+            })
+            .orElseGet(() -> Map.of("message", "예정된 모임이 없습니다."));
+    }
 }

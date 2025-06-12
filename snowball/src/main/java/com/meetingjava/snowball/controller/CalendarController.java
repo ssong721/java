@@ -1,18 +1,12 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.entity.Schedule;
-import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.entity.Calendar;
-
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import com.meetingjava.snowball.dto.ScheduleEventdto;
 
-import com.meetingjava.snowball.entity.Schedule;
-import com.meetingjava.snowball.dto.ScheduleEventdto;
 
 
 @RestController
