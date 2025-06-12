@@ -17,4 +17,5 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
      // 이번 달 일정 조회
     List<Schedule> findByScheduleDateBetween(LocalDate start, LocalDate end);
+    List<Schedule> findByMeetingIdAndScheduleDateBetween(String meetingId, LocalDate start, LocalDate end);
 }

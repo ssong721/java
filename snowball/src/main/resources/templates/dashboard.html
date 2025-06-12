@@ -70,6 +70,29 @@
             min-height: 350px;
         }
 
+        .next-meeting {
+        background-color: #e0e0e0;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        }
+
+        .next-meeting .label { /* 제목 */
+        font-size: 14px;
+        color: black;
+        font-weight: 500;
+        }
+
+        .next-meeting .value { /* 내용 */
+        font-size: 17px;
+        font-weight: bold;
+        color: black;
+        }
+
         .nav {
             position: fixed;
             bottom: 0;
@@ -118,18 +141,28 @@
         </div>
     </div>
 
-    <div class="block" th:text="${nextMeeting}">예정된 모임이 없습니다.</div>
+    <div class="block next-meeting">
+        <div class="label">다음 모임</div>
+        <div class="value">예정된 모임이 없습니다.</div>
+      </div>
     <div id="calendar" class="calendar"></div>
     <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항이 없습니다.</span></div>
 </main>
 
 <!-- ✅ 하단 네비게이션 바 -->
 <nav class="nav">
-    <a class="nav-link" href="#">
-        <a class="nav-link" href="/schedulemake"><div>📝</div><div>일정 생성</div></a>
+    <a class="nav-link" href="/schedulemake">
+        <div>📝</div>
+        <div>일정 생성</div>
     </a>
-    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}"><div>📋</div><div>일정 투표</div></a>
-    <a class="nav-link" href="#"><div>✅</div><div>출석 확인</div></a>
+    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}">
+        <div>📋</div>
+        <div>일정 투표</div>
+    </a>
+    <a class="nav-link" href="#">
+        <div>✅</div>
+        <div>출석 확인</div>
+    </a>
 </nav>
 
 <script th:inline="javascript">
@@ -152,32 +185,59 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    var calendarEl = document.getElementById('calendar');
-    if (!calendarEl) {
-      console.log("❌ calendar element not found!");
-      return;
-    }
-
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      locale: 'ko',
-      height: 'auto',
-      initialDate: '2025-06-01',  // 기본 날짜
-      events: [  // 여기를 정적 데이터로!
-        {
-          title: '학생회 회의',
-          start: '2025-06-10'
-        },
-        {
-          title: '아이데이션',
-          start: '2025-06-15',
-          end: '2025-06-17'
+      var calendarEl = document.getElementById('calendar');
+      if (!calendarEl) {
+        console.log("❌ calendar element not found!");
+        return;
+      }
+    
+      // Thymeleaf에서 meetingId를 JS 변수로 넘김
+      const meetingId = /*[[${meetingId}]]*/ 0;
+    
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ko',
+        height: 'auto',
+        events: function(info, successCallback, failureCallback) {
+          const year = info.start.getFullYear();
+          const month = info.start.getMonth() + 1; // 0-based → 1-based
+    
+          fetch(`/api/calendar/events/${year}/${month}?meetingId=${meetingId}`)
+            .then(response => response.json())
+            .then(data => {
+              successCallback(data);  // [{ title, start, end }]
+            })
+            .catch(error => {
+              console.error("일정 불러오기 실패:", error);
+              failureCallback(error);
+            });
         }
-      ]
+      });
+    
+      calendar.render();
     });
+    </script>   
+    
+    <script>
+    // 예정된 모임 표시
+    document.addEventListener('DOMContentLoaded', function () {
+  const meetingId = /*[[${meetingId}]]*/ 0;
 
-    calendar.render();
-  });
-</script>
+  fetch(`/api/schedule/next?meetingId=${meetingId}`)
+    .then(res => res.json())
+    .then(data => {
+      const target = document.querySelector('.next-meeting .value');  // 🔥 핵심 변경
+      if (target) {
+        if (data.meetingName && data.dateTime) {
+          target.textContent = `${data.meetingName} (${data.dateTime})`;
+        } else {
+          target.textContent = "예정된 모임이 없습니다.";
+        }
+      } else {
+        console.warn("❗ .next-meeting .value 요소가 없습니다.");
+      }
+            });
+        });
+        </script>
 </body>
 </html>
