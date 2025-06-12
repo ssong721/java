@@ -1,5 +1,7 @@
 package com.meetingjava.snowball.dto;
 
+import com.meetingjava.snowball.entity.Schedule;
+
 public class ScheduleEventdto {
     private String title;
     private String start;
@@ -9,6 +11,14 @@ public class ScheduleEventdto {
         this.title = title;
         this.start = start;
         this.end = end;
+    }
+    
+    public static ScheduleEventdto from(Schedule schedule) {
+        return new ScheduleEventdto(
+            schedule.getScheduleName(),
+            schedule.getStart(), // ISO_DATETIME
+            schedule.getEnd()
+        );
     }
 
     public String getTitle() {
@@ -22,5 +32,6 @@ public class ScheduleEventdto {
     public String getEnd() {
         return end;
     }
+
 }
 
