@@ -9,7 +9,7 @@ import java.util.*;
 public class StaticService {
 
     private final List<Schedule> allSchedules;
-    private final Map<String, Double> attendanceRates;  // meetingId → 출석률
+    private final Map<String, Double> attendanceRates; // meetingId → 출석률
 
     // 예시: userAttendanceRates 저장 (username+meetingId → 출석률)
     private final Map<String, Double> userAttendanceRates;
@@ -34,7 +34,7 @@ public class StaticService {
     public List<Integer> getMonthlyMeetingCounts() {
         Map<Integer, Integer> countPerMonth = new HashMap<>();
         for (Schedule schedule : allSchedules) {
-            int month = schedule.getScheduleDate().getMonthValue();
+            int month = schedule.getStartDate().getMonthValue();
             countPerMonth.put(month, countPerMonth.getOrDefault(month, 0) + 1);
         }
         return new ArrayList<>(countPerMonth.values());
@@ -57,16 +57,16 @@ public class StaticService {
         LocalDate now = LocalDate.now();
         return allSchedules.stream()
                 .filter(s -> s.getMeetingId().equals(meetingId))
-                .filter(s -> s.getScheduleDate().isAfter(now))
-                .sorted(Comparator.comparing(Schedule::getScheduleDate))
+                .filter(s -> s.getStartDate().isAfter(now))
+                .sorted(Comparator.comparing(Schedule::getStartDate))
                 .findFirst();
     }
 
     public Optional<Schedule> getTodaySchedule(String meetingId) {
         LocalDate today = LocalDate.now();
         return allSchedules.stream()
-                .filter(s -> s.getMeetingId().equals(meetingId))  // meetingId 필터링 추가
-                .filter(s -> s.getScheduleDate().isEqual(today))
+                .filter(s -> s.getMeetingId().equals(meetingId)) // meetingId 필터링 추가
+                .filter(s -> s.getStartDate().isEqual(today))
                 .findFirst();
     }
 }
