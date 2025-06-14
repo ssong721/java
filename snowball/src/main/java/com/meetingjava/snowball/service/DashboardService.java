@@ -1,6 +1,7 @@
 package com.meetingjava.snowball.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class DashboardService {
         List<Schedule> calendarList = staticService.getAllSchedules().stream()
                 .filter(s -> s.getMeetingId().equals(meetingId))
                 .filter(s -> {
-                    LocalDate date = s.getScheduleDate();
+                    LocalDate date = s.getStartDate();
                     return !date.isBefore(start) && !date.isAfter(end);
                 })
                 .toList();
@@ -52,9 +53,10 @@ public class DashboardService {
     }
 
     public String getNextMeetingInfo(String meetingId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         return staticService.getUpcomingSchedule(String.valueOf(meetingId))
-                .map(s -> s.getScheduleDate() + " - " + s.getScheduleName())
+                .map(s -> s.getStartDate().format(formatter) + " - " + s.getScheduleName())
                 .orElse("예정된 모임이 없습니다.");
     }
 }
-

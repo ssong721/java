@@ -5,6 +5,17 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Setter
+@NoArgsConstructor // 기본 생성자
+@AllArgsConstructor // 전체 필드 생성자
+@Builder // 빌더 패턴
 @Entity
 public class Schedule {
 
@@ -13,91 +24,47 @@ public class Schedule {
     private Long id;
 
     private String scheduleName;
-    private LocalDate scheduleDate;
+
+    private LocalDate startDate; // ✅ 일정 시작일
+    private LocalDate endDate; // ✅ 일정 종료일
+
     private LocalTime startTime;
     private LocalTime endTime;
 
-    // 추가: meetingId 필드
+    // 모임 구분용 필드 (예: 어떤 모임에 속한 일정인지)
     private String meetingId;
 
-    public Schedule() {}
-
-    public Schedule(String scheduleName, LocalDate scheduleDate, LocalTime startTime, LocalTime endTime) {
-        this.scheduleName = scheduleName;
-        this.scheduleDate = scheduleDate;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getScheduleName() {
-        return scheduleName;
-    }
-
-    public void setScheduleName(String scheduleName) {
-        this.scheduleName = scheduleName;
-    }
-
-    public LocalDate getScheduleDate() {
-        return scheduleDate;
-    }
-
-    public void setScheduleDate(LocalDate scheduleDate) {
-        this.scheduleDate = scheduleDate;
-    }
-
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
+    // 시작일 + 시작시간 → ISO 8601 형식 문자열 반환
     public String getStart() {
-        return scheduleDate
-            .atTime(startTime)
-            .format(DateTimeFormatter.ISO_DATE_TIME);
+        return startDate
+                .atTime(startTime)
+                .format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
-    }
-
+    // 종료일 + 종료시간 → ISO 8601 형식 문자열 반환
     public String getEnd() {
-        return scheduleDate
-            .atTime(endTime)
-            .format(DateTimeFormatter.ISO_DATE_TIME);
+        return endDate
+                .atTime(endTime)
+                .format(DateTimeFormatter.ISO_DATE_TIME);
     }
 
-    // 추가: meetingId getter/setter
-    public String getMeetingId() {
-        return meetingId;
-    }
-
-    public void setMeetingId(String meetingId) {
-        this.meetingId = meetingId;
-    }
-
+    // 일정 겹침 여부 판별 (단일일 기준, 필요시 확장 가능)
     public boolean isOverlapping(Schedule other) {
-        return this.scheduleDate.equals(other.scheduleDate) &&
-               !(this.endTime.isBefore(other.startTime) || this.startTime.isAfter(other.endTime));
+        return this.startDate.equals(other.startDate) &&
+                !(this.endTime.isBefore(other.startTime) || this.startTime.isAfter(other.endTime));
     }
 
-    public void editSchedule(String newName, LocalDate newDate, LocalTime newStart, LocalTime newEnd) {
+    // 일정 수정 로직
+    public void editSchedule(String newName, LocalDate newStartDate, LocalDate newEndDate, LocalTime newStart,
+            LocalTime newEnd) {
         this.scheduleName = newName;
-        this.scheduleDate = newDate;
+        this.startDate = newStartDate;
+        this.endDate = newEndDate;
         this.startTime = newStart;
         this.endTime = newEnd;
     }
 
+    // 캘린더 출력용 문자열
     public String convertToCalendarEvent() {
         return String.format("%s - %s: %s", startTime, endTime, scheduleName);
     }

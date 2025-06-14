@@ -30,18 +30,19 @@ public class ScheduleService {
     }
 
     public Optional<Schedule> getUpcomingSchedule(String meetingId) {
-        return scheduleRepository.findFirstByMeetingIdAndScheduleDateAfterOrderByScheduleDateAsc(
-    meetingId, LocalDate.now());
+        return scheduleRepository.findFirstByMeetingIdAndStartDateAfterOrderByStartDateAsc(
+                meetingId, LocalDate.now());
     }
 
     public Optional<Schedule> getTodaySchedule(String meetingId) {
-        return scheduleRepository.findByMeetingIdAndScheduleDate(
-            meetingId, LocalDate.now());
+        return scheduleRepository.findByMeetingIdAndStartDate(
+                meetingId, LocalDate.now());
     }
+
     public List<Schedule> getSchedulesByMonth(int year, int month) {
         LocalDateTime start = LocalDate.of(year, month, 1).atStartOfDay();
         LocalDateTime end = start.plusMonths(1).minusNanos(1);
-    
-        return scheduleRepository.findByScheduleDateBetween(start.toLocalDate(), end.toLocalDate());
+
+        return scheduleRepository.findByStartDateBetween(start.toLocalDate(), end.toLocalDate());
     }
 }
