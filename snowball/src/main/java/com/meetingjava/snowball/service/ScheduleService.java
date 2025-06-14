@@ -45,4 +45,10 @@ public class ScheduleService {
 
         return scheduleRepository.findByStartDateBetween(start.toLocalDate(), end.toLocalDate());
     }
+
+    public List<Schedule> getSchedulesByMeetingAndMonth(String meetingId, int year, int month) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+        return scheduleRepository.findByMeetingIdAndStartDateBetween(meetingId, start, end);
+    }
 }

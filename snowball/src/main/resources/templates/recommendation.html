@@ -79,12 +79,14 @@
     }
 
     button:enabled {
-      background-color: #4CAF50;
+      background-color: #007bff;
       cursor: pointer;
     }
   </style>
 </head>
-<body>
+
+<!-- ✅ 여기 수정: meetingId를 HTML 속성에 안전하게 삽입 -->
+<body th:attr="data-meeting-id=${meetingId}">
   <div class="container">
     <h2>추천 시간 확인</h2>
 
@@ -94,40 +96,42 @@
       <span th:if="${recommendedTime == null}">추천 시간이 없습니다</span>
     </div>
 
-    <form th:action="@{|/recommendation/${meetingId}/confirm|}" method="post" id="confirmForm">
-      <label class="label">날짜 선택</label>
-      <input type="date" id="date" name="date" th:value="${#dates.format(recommendedTime, 'yyyy-MM-dd')}" required />
+    <label class="label">날짜 선택</label>
+    <input type="date" id="date" th:value="${#dates.format(recommendedTime, 'yyyy-MM-dd')}" required />
 
-      <label class="label">시작 시간</label>
-      <div class="time-group">
-        <select id="startHour" name="startHour">
-          <option th:each="h : ${#numbers.sequence(0,23)}" th:value="${h}" th:text="${h}">18</option>
-        </select>
-        <select id="startMin" name="startMin">
-          <option value="00">00</option>
-          <option value="30">30</option>
-        </select>
-      </div>
+    <label class="label">시작 시간</label>
+    <div class="time-group">
+      <select id="startHour">
+        <option th:each="h : ${#numbers.sequence(0,23)}" th:value="${h}" th:text="${h}">18</option>
+      </select>
+      <select id="startMin">
+        <option value="00">00</option>
+        <option value="30">30</option>
+      </select>
+    </div>
 
-      <div class="divider">~</div>
+    <div class="divider">~</div>
 
-      <label class="label">종료 시간</label>
-      <div class="time-group">
-        <select id="endHour" name="endHour">
-          <option th:each="h : ${#numbers.sequence(0,23)}" th:value="${h}" th:text="${h}">19</option>
-        </select>
-        <select id="endMin" name="endMin">
-          <option value="00">00</option>
-          <option value="30">30</option>
-        </select>
-      </div>
+    <label class="label">종료 시간</label>
+    <div class="time-group">
+      <select id="endHour">
+        <option th:each="h : ${#numbers.sequence(0,23)}" th:value="${h}" th:text="${h}">19</option>
+      </select>
+      <select id="endMin">
+        <option value="00">00</option>
+        <option value="30">30</option>
+      </select>
+    </div>
 
-      <button id="submitBtn" type="submit" disabled>일정 확정</button>
-    </form>
+    <button id="submitBtn" disabled>일정 확정</button>
   </div>
 
   <script>
     const requiredIds = ['date', 'startHour', 'startMin', 'endHour', 'endMin'];
+    const submitBtn = document.getElementById('submitBtn');
+    const meetingId = document.body.getAttribute("data-meeting-id");
+
+    console.log("📌 전달된 meetingId:", meetingId);
 
     requiredIds.forEach(id => {
       document.getElementById(id).addEventListener('change', checkAllFieldsFilled);
@@ -135,8 +139,39 @@
 
     function checkAllFieldsFilled() {
       const allFilled = requiredIds.every(id => document.getElementById(id).value !== '');
-      document.getElementById('submitBtn').disabled = !allFilled;
+      submitBtn.disabled = !allFilled;
     }
+
+    submitBtn.addEventListener('click', () => {
+      const params = new URLSearchParams({
+        date: document.getElementById('date').value,
+        startHour: document.getElementById('startHour').value,
+        startMin: document.getElementById('startMin').value,
+        endHour: document.getElementById('endHour').value,
+        endMin: document.getElementById('endMin').value
+      });
+
+      fetch(`/recommendation/${meetingId}/confirm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: params
+      })
+      .then(res => res.text())
+      .then(text => {
+        if (text === 'ok') {
+          alert('✅ 일정이 확정되었습니다!');
+          window.location.href = `/dashboard/${meetingId}`;
+        } else {
+          alert('❌ 일정 확정 실패 😥');
+        }
+      })
+      .catch(err => {
+        console.error('❌ fetch 에러:', err);
+        alert('서버 오류 발생');
+      });
+    });
   </script>
 </body>
 </html>

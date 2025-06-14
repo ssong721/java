@@ -1,7 +1,7 @@
 package com.meetingjava.snowball.dashboard;
 
 import com.meetingjava.snowball.entity.Check;
-import com.meetingjava.snowball.service.ScheduleService;  // ✅ ScheduleService import
+import com.meetingjava.snowball.service.ScheduleService;
 import com.meetingjava.snowball.service.StaticService;
 import java.util.Date;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Dashboard {
 
-    private final ScheduleService scheduleService;  // ✅ ScheduleService로 수정
+    private final ScheduleService scheduleService;
     private final StaticService staticService;
     private final Check checkService;
 
@@ -43,10 +43,10 @@ public class Dashboard {
                                               .sum();
 
         staticService.getUpcomingSchedule(meeting)
-            .ifPresent(s -> this.upcomingMeeting = java.sql.Date.valueOf(s.getScheduleDate()));
+            .ifPresent(s -> this.upcomingMeeting = java.sql.Date.valueOf(s.getStartDate()));
 
         staticService.getTodaySchedule(meeting)
-            .ifPresent(s -> this.todayMeeting = java.sql.Date.valueOf(s.getScheduleDate()));
+            .ifPresent(s -> this.todayMeeting = java.sql.Date.valueOf(s.getStartDate()));
 
         if (checkService != null && checkServiceEnable()) {
             checkService.checkOn();

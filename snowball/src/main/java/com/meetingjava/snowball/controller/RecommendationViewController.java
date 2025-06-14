@@ -1,6 +1,7 @@
 package com.meetingjava.snowball.controller;
 
-import com.meetingjava.snowball.entity.ScheduleVote;
+import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.repository.ScheduleRepository;
 import com.meetingjava.snowball.service.ScheduleVoteService;
 import com.meetingjava.snowball.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -17,7 +20,8 @@ import java.util.*;
 public class RecommendationViewController {
 
     private final RecommendationService recommendationService;
-    private final ScheduleVoteService scheduleVoteService;  // ✅ 이 줄 반드시 추가해줘야 함!
+    private final ScheduleVoteService scheduleVoteService;
+    private final ScheduleRepository scheduleRepository;
 
     @GetMapping("/recommendation/{meetingId}")
     public String showRecommendationPage(@PathVariable String meetingId, Model model) {
@@ -34,18 +38,38 @@ public class RecommendationViewController {
         }
 
         model.addAttribute("meetingId", meetingId);
-        model.addAttribute("recommendedTime", bestTime);  // ✅ 아래 HTML에서 사용하기 위해 원본도 넘김
+        model.addAttribute("recommendedTime", bestTime);
         model.addAttribute("formattedRecommendedTime", formattedTime);
         model.addAttribute("availableUsers", availableUsers);
 
         return "recommendation";
     }
 
+    // ✅ fetch 대응용: ok 문자열 반환 + @ResponseBody
     @PostMapping("/recommendation/{meetingId}/confirm")
-    public String confirmTime(@PathVariable String meetingId,
-                              @RequestParam("selectedTime") String selectedTime) {
-        ScheduleVote vote = scheduleVoteService.findByMeetingId(meetingId);
-        scheduleVoteService.updateRecommendedTime(vote.getVoteId(), selectedTime);
-        return "redirect:/dashboard/" + meetingId;
+    @ResponseBody
+    public String confirmSchedule(@PathVariable String meetingId,
+                                  @RequestParam("date") String date,
+                                  @RequestParam("startHour") int startHour,
+                                  @RequestParam("startMin") int startMin,
+                                  @RequestParam("endHour") int endHour,
+                                  @RequestParam("endMin") int endMin) {
+
+        LocalDate scheduleDate = LocalDate.parse(date);
+        LocalTime startTime = LocalTime.of(startHour, startMin);
+        LocalTime endTime = LocalTime.of(endHour, endMin);
+
+        Schedule schedule = Schedule.builder()
+                .scheduleName("확정 일정")
+                .startDate(scheduleDate)
+                .endDate(scheduleDate)
+                .startTime(startTime)
+                .endTime(endTime)
+                .meetingId(meetingId)
+                .build();
+
+        scheduleRepository.save(schedule);
+
+        return "ok";  // fetch 응답용 문자열
     }
 }

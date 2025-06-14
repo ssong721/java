@@ -39,20 +39,26 @@ public class ScheduleApiController {
     @PutMapping("/{id}")
     public Schedule updateSchedule(@PathVariable Long id, @RequestBody Schedule updated) {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow();
-        schedule.editSchedule(updated.getScheduleName(), updated.getScheduleDate(), updated.getStartTime(),
-                updated.getEndTime());
+        schedule.editSchedule(
+            updated.getScheduleName(),
+            updated.getStartDate(),
+            updated.getEndDate(),
+            updated.getStartTime(),
+            updated.getEndTime()
+        );
         return scheduleRepository.save(schedule);
     }
 
     @PostMapping("/submit")
     public String saveSchedule(@RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam String startHour,
-            @RequestParam String startMin,
-            @RequestParam String startAMPM,
-            @RequestParam String endHour,
-            @RequestParam String endMin,
-            @RequestParam String endAMPM) {
+                                @RequestParam String endDate,
+                                @RequestParam String startHour,
+                                @RequestParam String startMin,
+                                @RequestParam String startAMPM,
+                                @RequestParam String endHour,
+                                @RequestParam String endMin,
+                                @RequestParam String endAMPM) {
+
         String startTime = startHour + ":" + startMin + " " + startAMPM;
         String endTime = endHour + ":" + endMin + " " + endAMPM;
 
@@ -61,7 +67,8 @@ public class ScheduleApiController {
         LocalTime end = LocalTime.parse(endTime, formatter);
 
         Schedule schedule = new Schedule();
-        schedule.setScheduleDate(LocalDate.parse(startDate));
+        schedule.setStartDate(LocalDate.parse(startDate));
+        schedule.setEndDate(LocalDate.parse(endDate));
         schedule.setStartTime(start);
         schedule.setEndTime(end);
 
@@ -69,17 +76,16 @@ public class ScheduleApiController {
 
         return "redirect:/dashboard/sample-meeting-id"; // 저장 후 리다이렉트
     }
-    
-    // 예정된 모임 관련 추가
+
     @GetMapping("/next")
     @ResponseBody
     public Map<String, String> getNextSchedule(@RequestParam String meetingId) {
         return scheduleRepository
-            .findFirstByMeetingIdAndScheduleDateAfterOrderByScheduleDateAsc(meetingId, LocalDate.now())
+            .findFirstByMeetingIdAndStartDateAfterOrderByStartDateAsc(meetingId, LocalDate.now())
             .map(schedule -> {
                 Map<String, String> map = new HashMap<>();
                 map.put("meetingName", schedule.getScheduleName());
-                map.put("dateTime", schedule.getScheduleDate().toString() + " " + schedule.getStartTime().toString());
+                map.put("dateTime", schedule.getStartDate().toString() + " " + schedule.getStartTime().toString());
                 return map;
             })
             .orElseGet(() -> Map.of("message", "예정된 모임이 없습니다."));
