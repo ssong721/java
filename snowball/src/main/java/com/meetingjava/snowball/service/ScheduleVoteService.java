@@ -36,7 +36,8 @@ public class ScheduleVoteService {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    public ScheduleVote findByMeetingId(String meetingId) {
+    public ScheduleVote findByMeetingId(String meetingIdRaw) {
+        String meetingId = meetingIdRaw.replaceAll("\"", "");
         return voteRepository.findByMeetingId(meetingId)
                 .orElseThrow(() -> new NoSuchElementException("해당 meetingId에 대한 투표 없음: " + meetingId));
     }
@@ -223,9 +224,13 @@ public class ScheduleVoteService {
         ScheduleVote vote = findByMeetingId(meetingId);
         String voteId = vote.getVoteId();
 
+        System.out.println("✅ voteId: " + voteId);
+
         List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_VoteId(voteId);
         Map<Date, Integer> countMap = new HashMap<>();
+        System.out.println("✅ submissions 개수: " + submissions.size());
 
+        
         for (VoteSubmission submission : submissions) {
             Date time = submission.getSelectedTime();
             countMap.put(time, countMap.getOrDefault(time, 0) + 1);
