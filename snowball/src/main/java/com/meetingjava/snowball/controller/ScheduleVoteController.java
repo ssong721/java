@@ -1,6 +1,7 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.dto.ScheduleVoteRequest;
+import com.meetingjava.snowball.entity.ScheduleCandidate;
 import com.meetingjava.snowball.entity.ScheduleVote;
 import com.meetingjava.snowball.entity.VoteSubmission;
 import com.meetingjava.snowball.service.GeminiService;
@@ -22,6 +23,13 @@ public class ScheduleVoteController {
 
     private final ScheduleVoteService voteService;
     private final GeminiService geminiService;
+
+    // ✅ 일정 후보 조회 API 추가
+    @GetMapping("/{voteId}/candidates")
+    public ResponseEntity<List<ScheduleCandidate>> getCandidates(@PathVariable String voteId) {
+        List<ScheduleCandidate> candidates = voteService.getCandidates(voteId); // → 내부에서 service 통해 조회
+        return ResponseEntity.ok(candidates);
+    }
 
     // ✅ 투표 생성
     @PostMapping("/create")

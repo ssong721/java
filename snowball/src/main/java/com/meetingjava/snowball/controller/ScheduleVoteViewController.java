@@ -55,6 +55,7 @@ public class ScheduleVoteViewController {
         model.addAttribute("formattedRecommendedTime", formattedTime);
         model.addAttribute("recommendedTime", recommendedTime); // 꼭 남겨둬도 됨
         model.addAttribute("availableUsers", Optional.ofNullable(vote.getAvailableUsers()).orElse(new ArrayList<>()));
+        model.addAttribute("candidates", scheduleVoteService.getCandidates(vote.getVoteId()));
 
         return "schedulevote";
     }

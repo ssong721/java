@@ -20,8 +20,8 @@ public class Dashboard {
     private Date todayMeeting;
 
     public Dashboard(ScheduleService scheduleService,
-                     StaticService staticService,
-                     Check checkService) {
+            StaticService staticService,
+            Check checkService) {
         this.scheduleService = scheduleService;
         this.staticService = staticService;
         this.checkService = checkService;
@@ -38,15 +38,15 @@ public class Dashboard {
 
         this.attendanceRate = staticService.calculateAttendanceRate(meeting);
         this.totalMeetingCount = staticService.getMonthlyMeetingCounts()
-                                              .stream()
-                                              .mapToInt(Integer::intValue)
-                                              .sum();
+                .stream()
+                .mapToInt(Integer::intValue)
+                .sum();
 
         staticService.getUpcomingSchedule(meeting)
-            .ifPresent(s -> this.upcomingMeeting = java.sql.Date.valueOf(s.getStartDate()));
+                .ifPresent(s -> this.upcomingMeeting = java.sql.Date.valueOf(s.getStartDate()));
 
         staticService.getTodaySchedule(meeting)
-            .ifPresent(s -> this.todayMeeting = java.sql.Date.valueOf(s.getStartDate()));
+                .ifPresent(s -> this.todayMeeting = java.sql.Date.valueOf(s.getStartDate()));
 
         if (checkService != null && checkServiceEnable()) {
             checkService.checkOn();
