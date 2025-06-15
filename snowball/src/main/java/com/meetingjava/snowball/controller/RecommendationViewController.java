@@ -1,6 +1,7 @@
 package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.repository.ScheduleCandidateRepository;
 import com.meetingjava.snowball.repository.ScheduleRepository;
 import com.meetingjava.snowball.service.ScheduleVoteService;
 import com.meetingjava.snowball.service.RecommendationService;
@@ -22,6 +23,7 @@ public class RecommendationViewController {
     private final RecommendationService recommendationService;
     private final ScheduleVoteService scheduleVoteService;
     private final ScheduleRepository scheduleRepository;
+    private final ScheduleCandidateRepository scheduleCandidateRepository;
 
     @GetMapping("/recommendation/{meetingId}")
     public String showRecommendationPage(@PathVariable String meetingId, Model model) {
@@ -49,27 +51,32 @@ public class RecommendationViewController {
     @PostMapping("/recommendation/{meetingId}/confirm")
     @ResponseBody
     public String confirmSchedule(@PathVariable String meetingId,
-                                  @RequestParam("date") String date,
-                                  @RequestParam("startHour") int startHour,
-                                  @RequestParam("startMin") int startMin,
-                                  @RequestParam("endHour") int endHour,
-                                  @RequestParam("endMin") int endMin) {
+                                @RequestParam("startDate") String startDateStr,
+                                @RequestParam("endDate") String endDateStr,
+                                @RequestParam("startHour") int startHour,
+                                @RequestParam("startMin") int startMin,
+                                @RequestParam("endHour") int endHour,
+                                @RequestParam("endMin") int endMin) {
 
-        LocalDate scheduleDate = LocalDate.parse(date);
+        LocalDate startDate = LocalDate.parse(startDateStr);
+        LocalDate endDate = LocalDate.parse(endDateStr);
         LocalTime startTime = LocalTime.of(startHour, startMin);
         LocalTime endTime = LocalTime.of(endHour, endMin);
 
+        // ✅ schedule_candidate에서 schedule_name 가져오기
+        String scheduleName = scheduleCandidateRepository.findFirstScheduleNameByMeetingId(meetingId)
+            .orElse("확정 일정");
+
         Schedule schedule = Schedule.builder()
-                .scheduleName("확정 일정")
-                .startDate(scheduleDate)
-                .endDate(scheduleDate)
+                .scheduleName(scheduleName)
+                .startDate(startDate)
+                .endDate(endDate)
                 .startTime(startTime)
                 .endTime(endTime)
                 .meetingId(meetingId)
                 .build();
 
         scheduleRepository.save(schedule);
-
-        return "ok";  // fetch 응답용 문자열
+        return "ok";
     }
 }

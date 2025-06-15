@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>일정 후보 목록</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+    }
+    .container {
+      background-color: white;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+      min-height: 100vh;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .candidate-card {
+      background-color: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .candidate-card:hover {
+      background-color: #e2e6ea;
+    }
+    .candidate-card .label {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .candidate-card .value {
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="title" th:text="${meetingName} + ' - 일정 후보 목록'">모임 일정 후보 목록</div>
+
+  <a th:each="c : ${candidates}"
+     th:href="@{'/schedule/candidates/schedulevote/from-candidate/' + ${c.id}}"
+     style="text-decoration: none; color: inherit;">
+    <div class="candidate-card">
+      <div class="label">제목</div>
+      <div class="value" th:text="${c.scheduleName}">제목</div>
+
+      <div class="label">시작</div>
+      <div class="value" th:text="${c.startDate} + ' ' + ${c.startTime}">2025-06-15 10:00</div>
+
+      <div class="label">종료</div>
+      <div class="value" th:text="${c.endDate} + ' ' + ${c.endTime}">2025-06-15 11:00</div>
+    </div>
+  </a>
+
+  <div class="text-center mt-4">
+    <a class="btn btn-outline-secondary" th:href="@{'/dashboard/' + ${meetingId}}">← 대시보드로</a>
+  </div>
+</div>
+</body>
+</html>

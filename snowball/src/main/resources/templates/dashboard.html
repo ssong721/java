@@ -2,11 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ 추가됨 -->
     <title>대시보드</title>
-    <!-- CDN 테스트 -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/locales-all.min.js'></script>
+    
+    <!-- FullCalendar CDN -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/locales-all.min.js'></script>
+
     <style>
         html, body {
             height: 100%;
@@ -71,26 +74,26 @@
         }
 
         .next-meeting {
-        background-color: #e0e0e0;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        font-size: 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
+            background-color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
         }
 
-        .next-meeting .label { /* 제목 */
-        font-size: 14px;
-        color: black;
-        font-weight: 500;
+        .next-meeting .label {
+            font-size: 14px;
+            color: black;
+            font-weight: 500;
         }
 
-        .next-meeting .value { /* 내용 */
-        font-size: 17px;
-        font-weight: bold;
-        color: black;
+        .next-meeting .value {
+            font-size: 17px;
+            font-weight: bold;
+            color: black;
         }
 
         .nav {
@@ -120,14 +123,7 @@
 </head>
 <body>
 <main class="form-signin">
-    <a th:href="@{/home}" style="
-        text-decoration: none;
-        color: black;
-        font-size: 24px;
-        padding: 4px 12px;
-    ">
-        ←
-    </a>
+    <a th:href="@{/home}" style="text-decoration: none; color: black; font-size: 24px; padding: 4px 12px;">←</a>
     <h1 th:text="${meetingName}">모임 이름</h1>
 
     <div class="grid">
@@ -144,9 +140,14 @@
     <div class="block next-meeting">
         <div class="label">다음 모임</div>
         <div class="value">예정된 모임이 없습니다.</div>
-      </div>
+    </div>
+
     <div id="calendar" class="calendar"></div>
-    <div class="block"><span class="notice-icon">🔖</span><span th:text="${noticeTitle}">공지사항이 없습니다.</span></div>
+
+    <div class="block">
+        <span class="notice-icon">🔖</span>
+        <span th:text="${noticeTitle}">공지사항이 없습니다.</span>
+    </div>
 </main>
 
 <!-- ✅ 하단 네비게이션 바 -->
@@ -155,7 +156,7 @@
         <div>📝</div>
         <div>일정 생성</div>
     </a>
-    <a class="nav-link" th:href="@{|/schedulevote/${meetingId}|}">
+    <a class="nav-link" th:href="@{'/schedule/candidates/' + ${meetingId}}">
         <div>📋</div>
         <div>일정 투표</div>
     </a>
@@ -165,80 +166,60 @@
     </a>
 </nav>
 
-<script th:inline="javascript">
-    const meetingId = /*[[${meetingId}]]*/ 0;
-    const userId = 1;
-
-    fetch(`/api/dashboard/${userId}/${meetingId}`)
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById('dashboard-container');
-            if (container) {
-                container.innerHTML = `
-                    <div><strong>우리 모임 출석률:</strong> ${data.groupAttendanceRate}%</div>
-                    <div><strong>나의 출석률:</strong> ${data.userAttendanceRate}%</div>
-                    <div><strong>다음 모임:</strong> ${data.nextMeeting}</div>
-                `;
-            }
-        });
-</script>
-
+<!-- ✅ FullCalendar 렌더링 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-      var calendarEl = document.getElementById('calendar');
-      if (!calendarEl) {
-        console.log("❌ calendar element not found!");
-        return;
-      }
-    
-      // Thymeleaf에서 meetingId를 JS 변수로 넘김
-      const meetingId = /*[[${meetingId}]]*/ 0;
-    
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'ko',
-        height: 'auto',
-        events: function(info, successCallback, failureCallback) {
-          const year = info.start.getFullYear();
-          const month = info.start.getMonth() + 1; // 0-based → 1-based
-    
-          // ✅ 확정 일정 API만 호출!
-         fetch(`/api/calendar/events/${year}/${month}`)
-            .then(response => response.json())
-            .then(data => {
-              successCallback(data);  // [{ title, start, end }]
-            })
-            .catch(error => {
-              console.error("일정 불러오기 실패:", error);
-              failureCallback(error);
-            });
+        var calendarEl = document.getElementById('calendar');
+        if (!calendarEl) {
+            console.log("❌ calendar element not found!");
+            return;
         }
-      });
-    
-      calendar.render();
-    });
-    </script>   
-    
-    <script>
-    // 예정된 모임 표시
-    document.addEventListener('DOMContentLoaded', function () {
-  const meetingId = /*[[${meetingId}]]*/ 0;
 
-  fetch(`/api/schedule/next?meetingId=${meetingId}`)
-    .then(res => res.json())
-    .then(data => {
-      const target = document.querySelector('.next-meeting .value');  // 핵심 변경
-      if (target) {
-        if (data.meetingName && data.dateTime) {
-          target.textContent = `${data.meetingName} (${data.dateTime})`;
-        } else {
-          target.textContent = "예정된 모임이 없습니다.";
-        }
-      } else {
-        console.warn("❗ .next-meeting .value 요소가 없습니다.");
-      }
-            });
+        const meetingId = /*[[${meetingId}]]*/ 0;
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            height: 'auto',
+            events: function(info, successCallback, failureCallback) {
+                const year = info.start.getFullYear();
+                const month = info.start.getMonth() + 1;
+
+                fetch(`/api/schedule/calendar/events/${year}/${month}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("📅 일정 로드 성공:", data);
+                        successCallback(data);
+                    })
+                    .catch(error => {
+                        console.error("일정 불러오기 실패:", error);
+                        failureCallback(error);
+                    });
+            }
         });
-        </script>
+
+        calendar.render();
+    });
+</script>
+
+<!-- ✅ 다음 모임 표시 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const meetingId = /*[[${meetingId}]]*/ 0;
+
+        fetch(`/api/schedule/next?meetingId=${meetingId}`)
+            .then(res => res.json())
+            .then(data => {
+                const target = document.querySelector('.next-meeting .value');
+                if (target) {
+                    if (data.meetingName && data.dateTime) {
+                        target.textContent = `${data.meetingName} (${data.dateTime})`;
+                    } else {
+                        target.textContent = "예정된 모임이 없습니다.";
+                    }
+                }
+            });
+    });
+</script>
 </body>
 </html>

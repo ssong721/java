@@ -82,22 +82,30 @@
       background-color: #007bff;
       cursor: pointer;
     }
+
+    .dashboard-btn {
+      margin-top: 10px;
+      background-color: #6c757d;
+      cursor: pointer;
+    }
   </style>
 </head>
 
-<!-- ✅ 여기 수정: meetingId를 HTML 속성에 안전하게 삽입 -->
 <body th:attr="data-meeting-id=${meetingId}">
   <div class="container">
     <h2>추천 시간 확인</h2>
 
     <div class="highlight">
-      추천된 모임 시간: 
+      추천된 모임 시간:
       <span th:if="${recommendedTime != null}" th:text="${#dates.format(recommendedTime, 'yyyy-MM-dd HH:mm')}">2025-06-15 18:00</span>
       <span th:if="${recommendedTime == null}">추천 시간이 없습니다</span>
     </div>
 
-    <label class="label">날짜 선택</label>
-    <input type="date" id="date" th:value="${#dates.format(recommendedTime, 'yyyy-MM-dd')}" required />
+    <label class="label">시작 날짜</label>
+    <input type="date" id="startDate" required />
+
+    <label class="label">종료 날짜</label>
+    <input type="date" id="endDate" required />
 
     <label class="label">시작 시간</label>
     <div class="time-group">
@@ -124,14 +132,13 @@
     </div>
 
     <button id="submitBtn" disabled>일정 확정</button>
+    <button class="dashboard-btn" onclick="goHome()">홈으로 돌아가기</button>
   </div>
 
   <script>
-    const requiredIds = ['date', 'startHour', 'startMin', 'endHour', 'endMin'];
+    const requiredIds = ['startDate', 'endDate', 'startHour', 'startMin', 'endHour', 'endMin'];
     const submitBtn = document.getElementById('submitBtn');
     const meetingId = document.body.getAttribute("data-meeting-id");
-
-    console.log("📌 전달된 meetingId:", meetingId);
 
     requiredIds.forEach(id => {
       document.getElementById(id).addEventListener('change', checkAllFieldsFilled);
@@ -144,7 +151,8 @@
 
     submitBtn.addEventListener('click', () => {
       const params = new URLSearchParams({
-        date: document.getElementById('date').value,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
         startHour: document.getElementById('startHour').value,
         startMin: document.getElementById('startMin').value,
         endHour: document.getElementById('endHour').value,
@@ -162,7 +170,6 @@
       .then(text => {
         if (text === 'ok') {
           alert('✅ 일정이 확정되었습니다!');
-          window.location.href = `/dashboard/${meetingId}`;
         } else {
           alert('❌ 일정 확정 실패 😥');
         }
@@ -172,6 +179,10 @@
         alert('서버 오류 발생');
       });
     });
+
+    function goHome() {
+      window.location.href = "/home";
+    }
   </script>
 </body>
 </html>
