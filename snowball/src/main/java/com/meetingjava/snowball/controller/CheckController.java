@@ -13,32 +13,42 @@ public class CheckController {
     @Autowired
     private Check check;
 
+    // 출석 체크 홈
+    @GetMapping("/home")
+    public String showHome(@RequestParam("meetingId") String meetingId, Model model) {
+        model.addAttribute("check", check);
+        model.addAttribute("isEnabled", check.isEnable());
+        model.addAttribute("meetingId", meetingId);
+        return "checkHome";
+    }
+
     // 출석 퀴즈 생성 폼
     @GetMapping("/form")
-    public String showCheckForm() {
-        return "checkForm";  // 퀴즈 생성하는 HTML
+    public String showCheckForm(@RequestParam("meetingId") String meetingId, Model model) {
+        model.addAttribute("meetingId", meetingId);
+        return "checkForm";
     }
 
     // 출석 퀴즈 생성 처리
     @PostMapping("/create")
     public String createCheck(@RequestParam String question,
-                              @RequestParam String answer) {
+                              @RequestParam String answer,
+                              @RequestParam String meetingId) {
         check.checkSet(question, "subjective");
         check.checkRun(answer);
         check.checkOn();
-        return "redirect:/check/answer";
+        return "redirect:/check/home?meetingId=" + meetingId;
     }
 
-    // 출석 퀴즈 통합 화면
+    // 출석 퀴즈 답변 폼
     @GetMapping("/answer")
-    public String showCheckPage(Model model) {
+    public String answerForm(@RequestParam("meetingId") String meetingId, Model model) {
         model.addAttribute("check", check);
-        model.addAttribute("isEnabled", check.isEnable());
-        model.addAttribute("message", check.isEnable() ? "출석 퀴즈가 생성되었습니다." : "아직 출석 퀴즈가 생성되지 않았습니다!");
-        return "check";  // check.html 하나로 통합
+        model.addAttribute("meetingId", meetingId);
+        return "checkAnswer";
     }
 
-    // 출석 제출 처리
+    // 출석 퀴즈 답변 제출
     @PostMapping("/submit")
     public String submitAnswer(@RequestParam String userAnswer, Model model) {
         boolean isCorrect = check.checkCode(userAnswer);
@@ -46,3 +56,5 @@ public class CheckController {
         return "checkResult";
     }
 }
+
+
