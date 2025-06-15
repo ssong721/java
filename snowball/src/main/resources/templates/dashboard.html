@@ -151,7 +151,7 @@
 
 <!-- ✅ 하단 네비게이션 바 -->
 <nav class="nav">
-    <a class="nav-link" href="/schedulemake">
+    <a class="nav-link" th:href="@{/schedulemake(meetingId=${meetingId})}">
         <div>📝</div>
         <div>일정 생성</div>
     </a>
@@ -202,7 +202,8 @@
           const year = info.start.getFullYear();
           const month = info.start.getMonth() + 1; // 0-based → 1-based
     
-          fetch(`/api/calendar/events/${year}/${month}?meetingId=${meetingId}`)
+          // ✅ 확정 일정 API만 호출!
+         fetch(`/api/calendar/events/${year}/${month}`)
             .then(response => response.json())
             .then(data => {
               successCallback(data);  // [{ title, start, end }]

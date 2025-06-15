@@ -86,6 +86,8 @@
     <label for="scheduleName">일정 이름</label>
     <input type="text" id="scheduleName" name="scheduleName" required>
 
+      <!-- 모임 ID를 hidden input으로 전달 -->
+    <input type="hidden" id="meetingId" name="meetingId" th:value="${meetingId}">
 
     <label for="startDate">시작 날짜</label>
     <input type="date" id="startDate" name="startDate" required>
@@ -95,22 +97,49 @@
 
    <label>시작 시간</label>
   <div class="time-group">
-    <select id="startHour" name="startHour"><option>10</option><option>11</option></select>
-    <select id="startMin" name="startMin"><option>00</option><option>30</option></select>
-    <select id="startAMPM" name="startAMPM"><option>AM</option><option>PM</option></select>
-  </div>
+     <select id="startHour" name="startHour"></select>
+     <select id="startMin" name="startMin">
+      <option>00</option>
+      <option>30</option>
+     </select>
+  <select id="startAMPM" name="startAMPM">
+      <option>AM</option>
+      <option>PM</option>
+     </select>
+   </div>
 
   <label>종료 시간</label>
   <div class="time-group">
-    <select id="endHour" name="endHour"><option>10</option><option>11</option></select>
-    <select id="endMin" name="endMin"><option>00</option><option>30</option></select>
-    <select id="endAMPM" name="endAMPM"><option>AM</option><option>PM</option></select>
+  <select id="endHour" name="endHour"></select>
+  <select id="endMin" name="endMin">
+    <option>00</option>
+    <option>30</option>
+  </select>
+  <select id="endAMPM" name="endAMPM">
+    <option>AM</option>
+    <option>PM</option>
+  </select>
+</div>
 
-  </div>
+<script>
+  function populateHourOptions(selectId) {
+    const select = document.getElementById(selectId);
+    for (let h = 1; h <= 12; h++) {
+      const opt = document.createElement("option");
+      opt.value = h;
+      opt.textContent = h;
+      select.appendChild(opt);
+    }
+  }
 
-    <button id="submitBtn" type="submit" disabled>만들기</button>
+  // 시작/종료 시각 드롭다운에 1~12시 채우기
+  populateHourOptions("startHour");
+  populateHourOptions("endHour");
+</script>
 
-  </div>
+  <button id="submitBtn" type="submit" disabled>만들기</button>
+
+  </form>
 
   <script>
     const requiredIds = [

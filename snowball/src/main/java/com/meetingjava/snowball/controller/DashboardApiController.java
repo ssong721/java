@@ -18,7 +18,7 @@ public class DashboardApiController {
     // JSON 데이터 제공용 API
     @GetMapping("/{userId}/{meetingId}")
     public DashboardResponse getDashboard(@PathVariable Long userId,
-            @PathVariable Long meetingId) {
+            @PathVariable String meetingId) {
         return dashboardService.getDashboardData(meetingId.toString());
     }
 }

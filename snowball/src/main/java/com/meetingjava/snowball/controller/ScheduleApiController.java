@@ -40,24 +40,25 @@ public class ScheduleApiController {
     public Schedule updateSchedule(@PathVariable Long id, @RequestBody Schedule updated) {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow();
         schedule.editSchedule(
-            updated.getScheduleName(),
-            updated.getStartDate(),
-            updated.getEndDate(),
-            updated.getStartTime(),
-            updated.getEndTime()
-        );
+                updated.getScheduleName(),
+                updated.getStartDate(),
+                updated.getEndDate(),
+                updated.getStartTime(),
+                updated.getEndTime());
         return scheduleRepository.save(schedule);
     }
 
     @PostMapping("/submit")
     public String saveSchedule(@RequestParam String startDate,
-                                @RequestParam String endDate,
-                                @RequestParam String startHour,
-                                @RequestParam String startMin,
-                                @RequestParam String startAMPM,
-                                @RequestParam String endHour,
-                                @RequestParam String endMin,
-                                @RequestParam String endAMPM) {
+            @RequestParam String endDate,
+            @RequestParam String startHour,
+            @RequestParam String startMin,
+            @RequestParam String startAMPM,
+            @RequestParam String endHour,
+            @RequestParam String endMin,
+            @RequestParam String endAMPM) {
+
+        System.out.println("🔥 submit 호출됨: " + startDate);
 
         String startTime = startHour + ":" + startMin + " " + startAMPM;
         String endTime = endHour + ":" + endMin + " " + endAMPM;
@@ -81,13 +82,13 @@ public class ScheduleApiController {
     @ResponseBody
     public Map<String, String> getNextSchedule(@RequestParam String meetingId) {
         return scheduleRepository
-            .findFirstByMeetingIdAndStartDateAfterOrderByStartDateAsc(meetingId, LocalDate.now())
-            .map(schedule -> {
-                Map<String, String> map = new HashMap<>();
-                map.put("meetingName", schedule.getScheduleName());
-                map.put("dateTime", schedule.getStartDate().toString() + " " + schedule.getStartTime().toString());
-                return map;
-            })
-            .orElseGet(() -> Map.of("message", "예정된 모임이 없습니다."));
+                .findFirstByMeetingIdAndStartDateAfterOrderByStartDateAsc(meetingId, LocalDate.now())
+                .map(schedule -> {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("meetingName", schedule.getScheduleName());
+                    map.put("dateTime", schedule.getStartDate().toString() + " " + schedule.getStartTime().toString());
+                    return map;
+                })
+                .orElseGet(() -> Map.of("message", "예정된 모임이 없습니다."));
     }
 }

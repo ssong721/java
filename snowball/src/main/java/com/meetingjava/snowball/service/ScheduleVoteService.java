@@ -1,8 +1,10 @@
 package com.meetingjava.snowball.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meetingjava.snowball.entity.ScheduleCandidate;
 import com.meetingjava.snowball.entity.ScheduleVote;
 import com.meetingjava.snowball.entity.VoteSubmission;
+import com.meetingjava.snowball.repository.ScheduleCandidateRepository;
 import com.meetingjava.snowball.repository.ScheduleVoteRepository;
 import com.meetingjava.snowball.repository.VoteSubmissionRepository;
 
@@ -22,10 +24,15 @@ public class ScheduleVoteService {
     private final VoteSubmissionRepository voteSubmissionRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final ScheduleCandidateRepository scheduleCandidateRepository;
 
     public ScheduleVote findByMeetingId(String meetingId) {
         return voteRepository.findByMeetingId(meetingId)
                 .orElseThrow(() -> new NoSuchElementException("해당 meetingId에 대한 투표 없음: " + meetingId));
+    }
+
+    public List<ScheduleCandidate> getCandidates(String voteId) {
+        return scheduleCandidateRepository.findByVoteId(voteId);
     }
 
     public ScheduleVote createVote(Date start, Date end, int durationMinutes, String meetingId) {
@@ -49,7 +56,8 @@ public class ScheduleVoteService {
         ScheduleVote vote = getVoteOrThrow(voteId);
 
         for (Date time : selectedDates) {
-            if (time == null) continue;
+            if (time == null)
+                continue;
             VoteSubmission submission = new VoteSubmission(vote, user, time);
             voteSubmissionRepository.save(submission);
         }
@@ -83,7 +91,7 @@ public class ScheduleVoteService {
 
         for (VoteSubmission submission : submissions) {
             voteMap.computeIfAbsent(submission.getUserName(), k -> new ArrayList<>())
-                   .add(submission.getSelectedTime());
+                    .add(submission.getSelectedTime());
         }
 
         ScheduleVote vote = getVoteOrThrow(voteId);
