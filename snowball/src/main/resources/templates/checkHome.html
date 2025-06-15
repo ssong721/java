@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 체크 홈</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f5f5f5; margin: 0; }
+    .container { max-width: 480px; margin: 0 auto; padding: 40px 20px; background-color: white; min-height: 100vh; }
+    h1 { font-size: 20px; font-weight: bold; margin-bottom: 24px; }
+    .message {
+      padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center;
+    }
+    .enabled { background-color: #e1f5e1; color: #087f23; }
+    .disabled { background-color: #ffe4e1; color: #d8000c; }
+    .nav {
+      display: flex; gap: 10px; justify-content: space-between; margin-top: 24px;
+    }
+    .nav a {
+      flex: 1; text-align: center; background-color: #2b2ee6; color: white;
+      padding: 12px; text-decoration: none; border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>출석 체크</h1>
+
+    <div th:if="${isEnabled}" class="message enabled">
+      출석 퀴즈가 생성되었습니다.
+    </div>
+    <div th:if="${!isEnabled}" class="message disabled">
+      아직 출석 퀴즈가 생성되지 않았습니다!
+    </div>
+
+    <div class="nav">
+      <a th:href="@{|/check/form?meetingId=${meetingId}|}">출석 퀴즈 생성</a>
+      <a th:href="@{|/check/answer?meetingId=${meetingId}|}">출석 답변</a>
+    </div>
+  </div>
+</body>
+</html>
+
+
+

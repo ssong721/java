@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 퀴즈 답변</title>
+  <style>
+    body { font-family: sans-serif; background-color: #f5f5f5; margin: 0; }
+    .container { max-width: 480px; margin: 0 auto; padding: 40px 20px; background-color: white; min-height: 100vh; }
+    h1 { font-size: 20px; font-weight: bold; margin-bottom: 24px; }
+    .question { font-size: 16px; margin-bottom: 12px; }
+    input[type="text"] {
+      width: 100%; padding: 10px; font-size: 16px;
+      border-radius: 6px; border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px; width: 100%; padding: 12px;
+      font-size: 16px; background-color: #2b2ee6; color: white;
+      border: none; border-radius: 8px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>출석 퀴즈에 답변</h1>
+    <form action="/check/submit" method="post">
+      <div class="question" th:text="${check.question}">출제된 질문</div>
+      <input type="text" name="userAnswer" placeholder="정답을 입력하세요" required>
+      <button type="submit">제출하기</button>
+    </form>
+  </div>
+</body>
+</html>

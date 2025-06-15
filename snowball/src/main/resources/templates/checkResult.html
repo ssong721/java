@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 결과</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: white;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .result {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 60px;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .success {
+      background-color: #e0f7e9;
+      color: #2e7d32;
+    }
+
+    .fail {
+      background-color: #ffe4e1;
+      color: #d8000c;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #2b2ee6;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div th:class="'result ' + (${result} == '출석 완료!' ? 'success' : 'fail')" th:text="${result}">결과 메시지</div>
+    <a th:href="@{/dashboard}" class="back-button">대시보드로 돌아가기</a>
+  </div>
+</body>
+</html>
