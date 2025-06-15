@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface ScheduleVoteRepository extends JpaRepository<ScheduleVote, String> {
     Optional<ScheduleVote> findByMeetingId(String meetingId);
+    void deleteByMeetingId(String meetingId);
 }
