@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/schedule")
@@ -21,22 +19,30 @@ public class ScheduleApiController {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
+    // 전체 일정 조회
     @GetMapping
+    @ResponseBody
     public List<Schedule> getAllSchedules() {
         return scheduleRepository.findAll();
     }
 
+    // 일정 생성 (JSON)
     @PostMapping
+    @ResponseBody
     public Schedule createSchedule(@RequestBody Schedule schedule) {
         return scheduleRepository.save(schedule);
     }
 
+    // 일정 삭제
     @DeleteMapping("/{id}")
+    @ResponseBody
     public void deleteSchedule(@PathVariable Long id) {
         scheduleRepository.deleteById(id);
     }
 
+    // 일정 수정
     @PutMapping("/{id}")
+    @ResponseBody
     public Schedule updateSchedule(@PathVariable Long id, @RequestBody Schedule updated) {
         Schedule schedule = scheduleRepository.findById(id).orElseThrow();
         schedule.editSchedule(
@@ -48,15 +54,16 @@ public class ScheduleApiController {
         return scheduleRepository.save(schedule);
     }
 
+    // 폼 기반 일정 생성
     @PostMapping("/submit")
     public String saveSchedule(@RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam String startHour,
-            @RequestParam String startMin,
-            @RequestParam String startAMPM,
-            @RequestParam String endHour,
-            @RequestParam String endMin,
-            @RequestParam String endAMPM) {
+                                @RequestParam String endDate,
+                                @RequestParam String startHour,
+                                @RequestParam String startMin,
+                                @RequestParam String startAMPM,
+                                @RequestParam String endHour,
+                                @RequestParam String endMin,
+                                @RequestParam String endAMPM) {
 
         System.out.println("🔥 submit 호출됨: " + startDate);
 
@@ -75,9 +82,10 @@ public class ScheduleApiController {
 
         scheduleRepository.save(schedule);
 
-        return "redirect:/dashboard/sample-meeting-id"; // 저장 후 리다이렉트
+        return "redirect:/dashboard/sample-meeting-id";
     }
 
+    // 다음 확정 일정 조회
     @GetMapping("/next")
     @ResponseBody
     public Map<String, String> getNextSchedule(@RequestParam String meetingId) {
@@ -90,5 +98,27 @@ public class ScheduleApiController {
                     return map;
                 })
                 .orElseGet(() -> Map.of("message", "예정된 모임이 없습니다."));
+    }
+
+    // ✅ FullCalendar 연동용 일정 반환 API
+    @GetMapping("/calendar/events/{year}/{month}")
+    @ResponseBody
+    public List<Map<String, String>> getScheduleEvents(@PathVariable int year, @PathVariable int month) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+
+        List<Schedule> schedules = scheduleRepository.findByStartDateBetween(start, end);
+
+        return schedules.stream().map(schedule -> {
+            Map<String, String> event = new HashMap<>();
+            event.put("title", schedule.getScheduleName());
+
+            String startStr = schedule.getStartDate() + "T" + schedule.getStartTime();
+            String endStr = schedule.getEndDate() + "T" + schedule.getEndTime();
+
+            event.put("start", startStr);
+            event.put("end", endStr);
+            return event;
+        }).collect(Collectors.toList());
     }
 }

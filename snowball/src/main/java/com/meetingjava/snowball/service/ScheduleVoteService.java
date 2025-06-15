@@ -1,6 +1,9 @@
 package com.meetingjava.snowball.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import com.meetingjava.snowball.entity.ScheduleCandidate;
 import com.meetingjava.snowball.entity.ScheduleVote;
 import com.meetingjava.snowball.entity.VoteSubmission;
@@ -8,11 +11,12 @@ import com.meetingjava.snowball.repository.ScheduleCandidateRepository;
 import com.meetingjava.snowball.repository.ScheduleVoteRepository;
 import com.meetingjava.snowball.repository.VoteSubmissionRepository;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -26,16 +30,33 @@ public class ScheduleVoteService {
     private final ObjectMapper objectMapper;
     private final ScheduleCandidateRepository scheduleCandidateRepository;
 
+    @PostConstruct
+    public void init() {
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
     public ScheduleVote findByMeetingId(String meetingId) {
         return voteRepository.findByMeetingId(meetingId)
                 .orElseThrow(() -> new NoSuchElementException("해당 meetingId에 대한 투표 없음: " + meetingId));
     }
 
     public List<ScheduleCandidate> getCandidates(String voteId) {
-        return scheduleCandidateRepository.findByVoteId(voteId);
+        ScheduleVote vote = voteRepository.findById(voteId).orElseThrow();
+        String meetingId = vote.getMeetingId();
+
+        System.out.println("✅ voteId로 조회된 meetingId: " + meetingId);
+
+        List<ScheduleCandidate> result = scheduleCandidateRepository.findByMeetingId(meetingId);
+        System.out.println("✅ 후보 일정 개수: " + result.size());
+
+        return result;
     }
 
     public ScheduleVote createVote(Date start, Date end, int durationMinutes, String meetingId) {
+        Optional<ScheduleVote> existing = voteRepository.findByMeetingId(meetingId);
+        if (existing.isPresent()) return existing.get(); // ✅ 이미 있으면 그걸 반환
+
         ScheduleVote vote = new ScheduleVote(start, end, durationMinutes, meetingId);
         return voteRepository.save(vote);
     }
@@ -47,33 +68,61 @@ public class ScheduleVoteService {
     }
 
     public void submitVote(String voteId, String user, List<String> selectedTimeStrs) {
+        System.out.println("✅ 받은 voteId: " + voteId);
+        
+        voteId = voteId.replaceAll("\"", ""); // <-- 이 줄 추가!!!
+        System.out.println("✅ 쌍따옴표 제거된 voteId: " + voteId);
+        System.out.println("✅ 받은 user: " + user);
+        System.out.println("✅ 받은 시간 문자열들: " + selectedTimeStrs);
+
         List<Date> selectedDates = convertToDateList(selectedTimeStrs);
+        System.out.println("✅ 변환된 Date 리스트: " + selectedDates);
 
         if (selectedDates.isEmpty()) {
+            System.out.println("❌ 모든 시간 파싱 실패. 예외 던짐!");
             throw new IllegalArgumentException("❌ 유효한 시간 없음. 모든 시간 파싱 실패");
         }
 
         ScheduleVote vote = getVoteOrThrow(voteId);
+        System.out.println("✅ ScheduleVote 조회 성공: " + vote.getVoteId());
 
         for (Date time : selectedDates) {
-            if (time == null)
-                continue;
+            if (time == null) {
+            System.out.println("⚠️ time == null 스킵");
+            continue;
+            }
+            System.out.println("📝 저장할 VoteSubmission: " + time);
             VoteSubmission submission = new VoteSubmission(vote, user, time);
             voteSubmissionRepository.save(submission);
         }
 
         vote.submitVote(user, selectedDates);
         voteRepository.save(vote);
+
+        System.out.println("✅ 투표 완료 및 저장 성공!");
+
     }
 
     private List<Date> convertToDateList(List<String> timeStrs) {
         List<Date> dates = new ArrayList<>();
         for (String timeStr : timeStrs) {
             try {
+                // 기본 ISO 포맷 (Z 포함) 처리
                 Instant instant = Instant.parse(timeStr);
-                dates.add(Date.from(instant));
-            } catch (Exception e) {
-                System.out.println("❌ 시간 변환 실패: " + timeStr);
+                Date parsed = Date.from(instant);
+                System.out.println("✅ Instant 파싱 성공: " + parsed);
+                dates.add(parsed);
+            } catch (Exception e1) {
+                try {
+                    // fallback: Z 포함된 포맷 명시 (주의: X는 타임존)
+                    SimpleDateFormat fallbackFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+                    fallbackFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    Date parsed = fallbackFormat.parse(timeStr);
+                    System.out.println("✅ fallback 파싱 성공: " + parsed);
+                    dates.add(parsed);
+                } catch (Exception e2) {
+                    System.out.println("❌ 시간 변환 실패: " + timeStr);
+                }
             }
         }
         return dates;
