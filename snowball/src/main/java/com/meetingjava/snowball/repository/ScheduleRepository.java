@@ -20,4 +20,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     // 특정 모임에 대한 월 단위 일정 조회
     List<Schedule> findByMeetingIdAndStartDateBetween(String meetingId, LocalDate start, LocalDate end);
+
+    // 데이터 삭제
+    void deleteByMeetingId(String meetingId);
 }
