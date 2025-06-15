@@ -1,6 +1,11 @@
 package com.meetingjava.snowball.service;
 
+import com.meetingjava.snowball.repository.MeetingRepository;
+import com.meetingjava.snowball.repository.ScheduleRepository;
+import com.meetingjava.snowball.repository.ScheduleVoteRepository;
 import com.meetingjava.snowball.repository.UserRepository;
+import com.meetingjava.snowball.entity.Meeting;
+import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.entity.User;
 import lombok.RequiredArgsConstructor;
 
@@ -13,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.transaction.Transactional;
 import java.util.Set;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -22,6 +28,9 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final @Lazy PasswordEncoder passwordEncoder;
+    private final MeetingRepository meetingRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final ScheduleVoteRepository scheduleVoteRepository;
 
     public void registerUser(String username, String password, String name) {
         if (userRepository.findByUsername(username).isPresent()) {
@@ -58,28 +67,31 @@ public class UserService implements UserDetailsService {
 
     private final Set<String> tokenBlacklist = ConcurrentHashMap.newKeySet();
 
-    public void logout(String token) {
-        if (token == null || token.isBlank()) {
-            throw new IllegalArgumentException("토큰이 유효하지 않습니다.");
-        }
-        if (tokenBlacklist.contains(token)) {
-            throw new IllegalStateException("이미 로그아웃된 토큰입니다.");
-        }
-        tokenBlacklist.add(token);
-    }
-
     public boolean isTokenBlacklisted(String token) {
         return tokenBlacklist.contains(token);
     }
 
     @Transactional
-    public void deleteByUsername(String username) {
-        // 연관된 meetings도 함께 가져옴
-        User user = userRepository.findWithMeetingsByUsername(username)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    public void deleteUserById(Long userId) {
+        // 1. 유저 조회
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 유저가 없습니다: " + userId));
 
-        // user가 host로 등록된 meeting들은 JPA cascade로 자동 삭제되도록 구성돼 있어야 함
+        // 2. 유저가 host인 meeting 모두 조회
+        List<Meeting> hostMeetings = meetingRepository.findByHostUser(user);
+
+        for (Meeting meeting : hostMeetings) {
+            // 3-1. Meeting ID로 연결된 Schedule 삭제
+            scheduleRepository.deleteByMeetingId(meeting.getMeetingId());
+
+            // 3-2. Meeting ID로 연결된 ScheduleVote 삭제
+            scheduleVoteRepository.deleteByMeetingId(meeting.getMeetingId());
+
+            // 3-3. Meeting 자체 삭제
+            meetingRepository.delete(meeting);
+        }
+
+        // 4. 유저 삭제
         userRepository.delete(user);
     }
-
 }
