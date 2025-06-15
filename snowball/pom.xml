@@ -55,7 +55,7 @@
             <version>8.3.0</version>
         </dependency>
 
-        <!-- Thymeleaf (중복 제거) -->
+        <!-- Thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -67,7 +67,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- 비밀번호 암호화용 Security Crypto -->
+        <!-- 비밀번호 암호화 -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
@@ -81,14 +81,14 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Jakarta Persistence (보통 JPA starter가 포함하지만, 명시해도 무방) -->
+        <!-- Jakarta Persistence -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- Devtools (개발용 자동 재시작) -->
+        <!-- Devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -102,11 +102,23 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- ✅ LocalDate, LocalTime 지원 (에러 해결) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- ✅ @PostConstruct 지원 -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- 컴파일러에 롬복 경로 추가 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -124,7 +136,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Spring Boot 실행 플러그인 -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
