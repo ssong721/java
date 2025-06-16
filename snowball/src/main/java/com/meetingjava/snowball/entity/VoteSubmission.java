@@ -16,7 +16,7 @@ public class VoteSubmission {
     private Date selectedTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vote_id", referencedColumnName = "vote_id")
+    @JoinColumn(name = "vote_id", referencedColumnName = "vote_id", nullable = false)
     private ScheduleVote vote;
 
     public VoteSubmission() {}

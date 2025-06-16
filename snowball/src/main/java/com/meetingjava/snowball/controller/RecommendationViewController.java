@@ -5,7 +5,7 @@ import com.meetingjava.snowball.entity.ScheduleCandidate;
 import com.meetingjava.snowball.repository.ScheduleCandidateRepository;
 import com.meetingjava.snowball.repository.ScheduleRepository;
 import com.meetingjava.snowball.service.ScheduleVoteService;
-import com.meetingjava.snowball.service.RecommendationService;
+// import com.meetingjava.snowball.service.RecommendationService; // ❌ 사용 안 하므로 주석 처리 or 삭제
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,16 +22,20 @@ import java.util.*;
 @Controller
 public class RecommendationViewController {
 
-    private final RecommendationService recommendationService;
+    // private final RecommendationService recommendationService; // ❌ 미사용
     private final ScheduleVoteService scheduleVoteService;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleCandidateRepository scheduleCandidateRepository;
 
-    @GetMapping("/recommendation/{meetingId}")
-    public String showRecommendationPage(@PathVariable String meetingId, Model model) {
-        Map<String, Object> result = recommendationService.getRecommendedInfo(meetingId);
+    @GetMapping("/recommendation/{voteId}")
+    public String showRecommendationPage(@PathVariable("voteId") String voteId, Model model) {
+        voteId = voteId.replaceAll("\"", ""); // ✅ 따옴표 제거
+
+        Map<String, Object> result = scheduleVoteService.getRecommendedTimeInfoByVoteId(voteId);
 
         Date bestTime = (Date) result.get("recommendedTime");
+
+        @SuppressWarnings("unchecked") // ⚠️ Unchecked cast 경고 제거
         List<String> availableUsers = (List<String>) result.get("availableUsers");
 
         String formattedTime = null;
@@ -41,29 +45,21 @@ public class RecommendationViewController {
                     .format(DateTimeFormatter.ofPattern("E요일 HH시", Locale.KOREAN));
         }
 
-        // ✅ 추천 시간과 가장 먼저 일치하는 후보 일정 가져오기
-        Optional<ScheduleCandidate> matchingCandidate = Optional.empty();
-        if (bestTime != null) {
-            List<ScheduleCandidate> candidates = scheduleCandidateRepository.findByMeetingId(meetingId);
-            matchingCandidate = candidates.stream()
-                .filter(c -> {
-                    LocalDate cDate = c.getStartDate();
-                    LocalTime cTime = c.getStartTime();
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(bestTime);
-                    return cDate.equals(LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH)))
-                        && cTime.equals(LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE)));
-                })
-                .findFirst();
-        }
+        // ✅ voteId로 후보 일정 리스트 가져오기
+        List<ScheduleCandidate> candidates = scheduleCandidateRepository.findByVoteId(voteId);
+        ScheduleCandidate firstCandidate = candidates.isEmpty() ? null : candidates.get(0);
 
-        Long candidateId = matchingCandidate.map(ScheduleCandidate::getId).orElse(null);
+        String scheduleName = (firstCandidate != null) ? firstCandidate.getScheduleName() : "확정 일정";
+        Long candidateId = (firstCandidate != null) ? firstCandidate.getId() : null;
+        String meetingId = (firstCandidate != null) ? firstCandidate.getMeetingId() : "unknown";
 
+        model.addAttribute("voteId", voteId);
         model.addAttribute("meetingId", meetingId);
+        model.addAttribute("scheduleName", scheduleName);
         model.addAttribute("recommendedTime", bestTime);
         model.addAttribute("formattedRecommendedTime", formattedTime);
         model.addAttribute("availableUsers", availableUsers);
-        model.addAttribute("candidateId", candidateId);  // ✅ HTML에 넘기기
+        model.addAttribute("candidateId", candidateId);
 
         return "recommendation";
     }
@@ -71,21 +67,21 @@ public class RecommendationViewController {
     @PostMapping("/recommendation/{meetingId}/confirm")
     @ResponseBody
     public String confirmSchedule(@PathVariable String meetingId,
-                                @RequestParam("startDate") String startDateStr,
-                                @RequestParam("endDate") String endDateStr,
-                                @RequestParam("startHour") int startHour,
-                                @RequestParam("startMin") int startMin,
-                                @RequestParam("endHour") int endHour,
-                                @RequestParam("endMin") int endMin,
-                                @RequestParam(value = "candidateId", required = false) String candidateIdStr) {
+                                  @RequestParam("startDate") String startDateStr,
+                                  @RequestParam("endDate") String endDateStr,
+                                  @RequestParam("startHour") int startHour,
+                                  @RequestParam("startMin") int startMin,
+                                  @RequestParam("endHour") int endHour,
+                                  @RequestParam("endMin") int endMin,
+                                  @RequestParam(value = "candidateId", required = false) String candidateIdStr) {
 
         LocalDate startDate = LocalDate.parse(startDateStr);
         LocalDate endDate = LocalDate.parse(endDateStr);
         LocalTime startTime = LocalTime.of(startHour, startMin);
         LocalTime endTime = LocalTime.of(endHour, endMin);
 
-        // ✅ schedule_name을 후보 일정에서 가져오기
         String scheduleName = "확정 일정";
+
         try {
             if (candidateIdStr != null && !candidateIdStr.isBlank()) {
                 Long candidateId = Long.parseLong(candidateIdStr);

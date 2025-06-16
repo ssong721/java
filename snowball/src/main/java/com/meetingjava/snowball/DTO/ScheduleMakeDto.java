@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -57,6 +58,7 @@ public class ScheduleMakeDto {
                     .startTime(sTime)
                     .endTime(eTime)
                     .meetingId(meetingId)
+                    .voteId(UUID.randomUUID().toString()) // ✅ 여기 추가!
                     .build();
 
         } catch (Exception e) {
