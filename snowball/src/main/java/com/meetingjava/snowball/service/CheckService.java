@@ -19,7 +19,7 @@ public class CheckService {
         this.attendanceRepository = attendanceRepository;
     }
 
-    // 특정 모임에 대한 체크 정보 조회
+    // 특정 모임의 체크 정보 1건 가져오기 (예외 발생 방지)
     public Optional<Check> getByMeetingId(String meetingId) {
         return checkRepository.findByMeetingId(meetingId);
     }
@@ -37,23 +37,13 @@ public class CheckService {
 
     // 정답 확인
     public boolean isCorrectAnswer(String meetingId, String userAnswer) {
-        Optional<Check> optionalCheck = checkRepository.findByMeetingId(meetingId);
-        if (optionalCheck.isPresent()) {
-            Check check = optionalCheck.get();
-            boolean correct = check.getAnswer().trim().equalsIgnoreCase(userAnswer.trim());
-
-            if (correct) {
-                // 출석 인정 (present = true 로 저장)
-                // 이미 출석 데이터가 있는지 확인하고 처리할 수도 있음
-                // 이 부분은 필요에 따라 확장 가능
-            }
-
-            return correct;
-        }
-        return false;
+        Optional<Check> optionalCheck = getByMeetingId(meetingId);
+        return optionalCheck
+                .map(check -> check.getAnswer().trim().equalsIgnoreCase(userAnswer.trim()))
+                .orElse(false);
     }
 
-    // 체크 삭제 + 출석도 삭제
+    // 체크 + 출석 삭제
     @Transactional
     public void deleteByMeetingId(String meetingId) {
         checkRepository.deleteByMeetingId(meetingId);

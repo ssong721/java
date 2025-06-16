@@ -1,20 +1,13 @@
 package com.meetingjava.snowball.service;
 
 import com.meetingjava.snowball.entity.Schedule;
-import com.meetingjava.snowball.entity.ScheduleVote;
-import com.meetingjava.snowball.entity.VoteSubmission;
 import com.meetingjava.snowball.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 @Service
 public class ScheduleService {
@@ -46,9 +39,14 @@ public class ScheduleService {
         return scheduleRepository.findByStartDateBetween(start.toLocalDate(), end.toLocalDate());
     }
 
+    // 일정 제목이 있는 일정만 반환 (임시 일정 제거 목적)
     public List<Schedule> getSchedulesByMeetingAndMonth(String meetingId, int year, int month) {
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
-        return scheduleRepository.findByMeetingIdAndStartDateBetween(meetingId, start, end);
+
+        return scheduleRepository.findByMeetingIdAndStartDateBetween(meetingId, start, end)
+                .stream()
+                .filter(s -> s.getScheduleName() != null && !s.getScheduleName().isBlank())
+                .toList();
     }
 }

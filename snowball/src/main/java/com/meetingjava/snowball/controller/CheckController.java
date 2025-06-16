@@ -94,14 +94,14 @@ public class CheckController {
         return "checkResult";
     }
 
-    // 출석 퀴즈 삭제 (퀴즈 + 관련 출석기록)
+    // 출석 퀴즈 삭제 (퀴즈 + 출석기록)
     @PostMapping("/delete")
     public String deleteCheck(@RequestParam("meetingId") String meetingId) {
         checkService.deleteByMeetingId(meetingId);
         return "redirect:/check/home?meetingId=" + meetingId;
     }
 
-    // 출석 퀴즈 관리 페이지 (햄버거 메뉴용)
+    // 햄버거 메뉴용 퀴즈 관리
     @GetMapping("/manage")
     public String managePage(@RequestParam("meetingId") String meetingId, Model model) {
         Check check = checkService.getByMeetingId(meetingId).orElse(null);
