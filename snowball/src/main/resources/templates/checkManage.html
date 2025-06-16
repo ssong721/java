@@ -31,18 +31,22 @@
       font-size: 20px;
       font-weight: bold;
       margin-bottom: 24px;
+      text-align: center;
     }
 
     .box {
-      background-color: #e0e0e0;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      background-color: #f0f0f0;
+      padding: 24px;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     }
 
     .question {
       font-size: 16px;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
     }
 
     .btn-delete {
@@ -51,9 +55,21 @@
       border: none;
       border-radius: 8px;
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       font-size: 16px;
       cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-delete:hover {
+      background-color: #d32f2f;
+    }
+
+    .no-question {
+      text-align: center;
+      font-size: 16px;
+      color: #555;
+      padding: 30px 0;
     }
   </style>
 </head>
@@ -62,12 +78,18 @@
     <a class="back-button" th:href="@{|/check/home?meetingId=${meetingId}|}">←</a>
     <h1>출석 퀴즈 관리</h1>
 
-    <div class="box">
+    <!-- 퀴즈가 존재할 때 -->
+    <div class="box" th:if="${check != null}">
       <div class="question" th:text="'현재 질문: ' + ${check.question}">현재 질문 내용</div>
       <form th:action="@{/check/delete}" method="post">
         <input type="hidden" name="meetingId" th:value="${meetingId}" />
         <button type="submit" class="btn-delete">출석 퀴즈 삭제하기</button>
       </form>
+    </div>
+
+    <!-- 퀴즈가 없을 때 -->
+    <div class="box" th:if="${check == null}">
+      <div class="no-question">현재 등록된 출석 퀴즈가 없습니다.</div>
     </div>
   </div>
 </body>

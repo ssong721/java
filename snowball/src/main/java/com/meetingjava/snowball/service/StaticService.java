@@ -1,36 +1,50 @@
 package com.meetingjava.snowball.service;
 
-import org.springframework.stereotype.Component;
+import com.meetingjava.snowball.entity.Attendance;
 import com.meetingjava.snowball.entity.Schedule;
+import com.meetingjava.snowball.repository.AttendanceRepository;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Component
+@Service
 public class StaticService {
 
+    private final AttendanceRepository attendanceRepository;
     private final List<Schedule> allSchedules;
-    private final Map<String, Double> attendanceRates; // meetingId → 출석률
 
-    // 예시: userAttendanceRates 저장 (username+meetingId → 출석률)
-    private final Map<String, Double> userAttendanceRates;
-
-    public StaticService(List<Schedule> allSchedules) {
-        this.allSchedules = allSchedules;
-        this.attendanceRates = new HashMap<>();
-        this.userAttendanceRates = new HashMap<>();
+    public StaticService(AttendanceRepository attendanceRepository) {
+        this.attendanceRepository = attendanceRepository;
+        this.allSchedules = new ArrayList<>();
     }
 
+    // 전체 출석률 자동 계산 (해당 모임 기준)
     public float calculateAttendanceRate(String meetingId) {
-        // 여기선 단순히 map에서 가져오고, 없으면 0f
-        return attendanceRates.getOrDefault(meetingId, 0.0).floatValue();
+        List<Attendance> records = attendanceRepository.findByMeetingId(meetingId);
+        if (records.isEmpty()) return 0f;
+
+        long presentCount = records.stream()
+                .filter(Attendance::isPresent)
+                .count();
+
+        return (float) presentCount / records.size() * 100f;
     }
 
-    // 유저 출석률 계산 메서드 추가
+    // 사용자 출석률 자동 계산 (모임 기준)
     public double calculateUserAttendanceRate(String username, String meetingId) {
-        String key = username + "_" + meetingId;
-        return userAttendanceRates.getOrDefault(key, 0.0);
+        List<Attendance> records = attendanceRepository.findByUsernameAndMeetingId(username, meetingId);
+        if (records.isEmpty()) return 0.0;
+
+        long presentCount = records.stream()
+                .filter(Attendance::isPresent)
+                .count();
+
+        return (double) presentCount / records.size() * 100.0;
     }
 
+    // 월별 모임 횟수 계산
     public List<Integer> getMonthlyMeetingCounts() {
         Map<Integer, Integer> countPerMonth = new HashMap<>();
         for (Schedule schedule : allSchedules) {
@@ -40,19 +54,7 @@ public class StaticService {
         return new ArrayList<>(countPerMonth.values());
     }
 
-    public void updateAttendanceRate(String meetingId, double rate) {
-        attendanceRates.put(meetingId, rate);
-    }
-
-    public void updateUserAttendanceRate(String username, String meetingId, double rate) {
-        String key = username + "_" + meetingId;
-        userAttendanceRates.put(key, rate);
-    }
-
-    public List<Schedule> getAllSchedules() {
-        return allSchedules;
-    }
-
+    // 오늘 이후 예정된 모임 찾기
     public Optional<Schedule> getUpcomingSchedule(String meetingId) {
         LocalDate now = LocalDate.now();
         return allSchedules.stream()
@@ -62,11 +64,22 @@ public class StaticService {
                 .findFirst();
     }
 
+    // 오늘 날짜의 모임 찾기
     public Optional<Schedule> getTodaySchedule(String meetingId) {
         LocalDate today = LocalDate.now();
         return allSchedules.stream()
-                .filter(s -> s.getMeetingId().equals(meetingId)) // meetingId 필터링 추가
+                .filter(s -> s.getMeetingId().equals(meetingId))
                 .filter(s -> s.getStartDate().isEqual(today))
                 .findFirst();
+    }
+
+    // 일정 수동 등록 (테스트용 or 수동 계산용)
+    public void setAllSchedules(List<Schedule> schedules) {
+        this.allSchedules.clear();
+        this.allSchedules.addAll(schedules);
+    }
+
+    public List<Schedule> getAllSchedules() {
+        return allSchedules;
     }
 }

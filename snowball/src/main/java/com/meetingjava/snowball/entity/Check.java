@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter @Setter
+@Table(name = "check_quiz") 
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Check {
 
     @Id
@@ -15,15 +18,16 @@ public class Check {
 
     private String meetingId;
 
-    private boolean enable;
-
     private String question;
 
     private String answer;
+
+    private boolean enable;
 
     private String method;
 
     private double rate;
 }
+
 
 

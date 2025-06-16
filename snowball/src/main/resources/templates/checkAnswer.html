@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>출석 퀴즈에 답변</title>
+  <title>출석 퀴즈 답변</title>
   <style>
     body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
     .container { max-width: 480px; margin: 0 auto; padding: 40px 20px; background-color: white; min-height: 100vh; }
@@ -50,12 +50,18 @@
 <body>
   <div class="container">
     <a class="back-button" th:href="@{|/check/home?meetingId=${meetingId}|}">←</a>
-    <h1>출석 퀴즈에 답변</h1>
+    <h1>출석 퀴즈 답변</h1>
     <form action="/check/submit" method="post">
-      <div class="question" th:text="${check.question}">오늘 회장이 입은 옷 색은?</div>
+      <!-- meetingId 전달용 hidden 필드 -->
+      <input type="hidden" name="meetingId" th:value="${meetingId}" />
+
+      <!-- 질문 표시 -->
+      <div class="question" th:if="${check != null}" th:text="${check.question}">질문을 불러올 수 없습니다.</div>
+
       <input type="text" name="userAnswer" placeholder="정답을 입력하세요" required>
       <button type="submit">제출하기</button>
     </form>
   </div>
 </body>
 </html>
+
