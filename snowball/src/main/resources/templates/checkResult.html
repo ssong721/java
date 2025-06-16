@@ -18,14 +18,32 @@
       background-color: white;
       min-height: 100vh;
       text-align: center;
+      position: relative;
+    }
+
+    .back-button {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      font-size: 24px;
+      text-decoration: none;
+      color: black;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 40px;
     }
 
     .result {
       font-size: 18px;
       font-weight: bold;
-      margin-top: 60px;
+      margin: 40px auto 30px;
       padding: 20px;
       border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
     }
 
     .success {
@@ -38,22 +56,46 @@
       color: #d8000c;
     }
 
-    .back-button {
-      display: inline-block;
-      margin-top: 30px;
+    .back-dashboard {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       padding: 10px 20px;
-      background-color: #2b2ee6;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
+      background-color: white;
+      border: 2px solid #888;
+      color: #444;
       font-size: 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .back-dashboard:hover {
+      background-color: #f0f0f0;
+      color: #222;
+    }
+
+    .back-dashboard .arrow {
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- 상단 ← 버튼: 출석 답변 페이지로 -->
+    <a class="back-button" th:href="@{|/check/answer?meetingId=${meetingId}|}">←</a>
+
+    <!-- 제목 -->
+    <h1>출석 결과</h1>
+
+    <!-- 결과 메시지 -->
     <div th:class="'result ' + (${result} == '출석 완료!' ? 'success' : 'fail')" th:text="${result}">결과 메시지</div>
-    <a th:href="@{/dashboard}" class="back-button">대시보드로 돌아가기</a>
+
+    <!-- 대시보드로 돌아가기 버튼 -->
+    <a class="back-dashboard" th:href="@{|/dashboard/${meetingId}|}">
+      <span class="arrow">←</span> 대시보드로
+    </a>
   </div>
 </body>
 </html>

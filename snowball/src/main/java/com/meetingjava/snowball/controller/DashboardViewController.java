@@ -2,7 +2,6 @@ package com.meetingjava.snowball.controller;
 
 import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.dto.ScheduleEventdto;
-import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.service.DashboardService;
 import com.meetingjava.snowball.service.MeetingService;
 import com.meetingjava.snowball.service.NoticeService;
@@ -54,7 +53,7 @@ public class DashboardViewController {
                                 Model model,
                                 @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            System.out.println("\u26a0\ufe0f 로그인 정보 없음, 로그인 페이지로 리다이렉트");
+            System.out.println("⚠️ 로그인 정보 없음, 로그인 페이지로 리다이렉트");
             return "redirect:/login";
         }
 

@@ -126,16 +126,16 @@
     <a th:href="@{/home}" style="text-decoration: none; color: black; font-size: 24px; padding: 4px 12px;">←</a>
     <h1 th:text="${meetingName}">모임 이름</h1>
 
-    <div class="grid">
-        <div class="card">
-            <div class="percentage" th:text="${groupAttendanceRate + '%'}">0.0%</div>
-            <div class="label">우리 모임 출석률</div>
-        </div>
-        <div class="card">
-            <div class="percentage" th:text="${myAttendanceRate + '%'}">0.0%</div>
-            <div class="label">나의 출석률</div>
-        </div>
+<div class="grid">
+    <div class="card">
+        <div class="percentage" th:text="|${groupAttendanceRate}%|">0.0%</div>
+        <div class="label">우리 모임 출석률</div>
     </div>
+    <div class="card">
+        <div class="percentage" th:text="|${myAttendanceRate}%|">0.0%</div>
+        <div class="label">나의 출석률</div>
+    </div>
+</div>
 
     <div class="block next-meeting">
         <div class="label">다음 모임</div>
@@ -160,7 +160,7 @@
         <div>📋</div>
         <div>일정 투표</div>
     </a>
-    <a class="nav-link" th:href="@{'/check/home?meetingId=' + ${meetingId}}">
+    <a class="nav-link" th:href="@{/check/home(meetingId=${meetingId})}">
         <div>✅</div>
         <div>출석 확인</div>
     </a>
