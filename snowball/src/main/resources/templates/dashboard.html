@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ✅ 추가됨 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>대시보드</title>
     
     <!-- FullCalendar CDN -->
@@ -150,7 +150,7 @@
     </div>
 </main>
 
-<!-- ✅ 하단 네비게이션 바 -->
+<!-- 하단 네비게이션 바 -->
 <nav class="nav">
     <a class="nav-link" th:href="@{/schedulemake(meetingId=${meetingId})}">
         <div>📝</div>
@@ -160,13 +160,13 @@
         <div>📋</div>
         <div>일정 투표</div>
     </a>
-    <a class="nav-link" th:href="@{|/check/answer?meetingId=${meetingId}|}">
+    <a class="nav-link" th:href="@{'/check/home?meetingId=' + ${meetingId}}">
         <div>✅</div>
         <div>출석 확인</div>
     </a>
 </nav>
 
-<!-- ✅ FullCalendar 렌더링 -->
+<!-- FullCalendar 렌더링 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
@@ -202,7 +202,7 @@
     });
 </script>
 
-<!-- ✅ 다음 모임 표시 -->
+<!-- 다음 모임 표시 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const meetingId = /*[[${meetingId}]]*/ 0;
@@ -220,6 +220,8 @@
                 }
             });
     });
+       // 콘솔로 meetingId 값 확인!
+       console.log("🪪 전달된 meetingId:", meetingId);
 </script>
 </body>
 </html>
