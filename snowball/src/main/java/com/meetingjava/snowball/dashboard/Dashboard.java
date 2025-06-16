@@ -1,9 +1,11 @@
 package com.meetingjava.snowball.dashboard;
 
-import com.meetingjava.snowball.entity.Check;
 import com.meetingjava.snowball.service.ScheduleService;
 import com.meetingjava.snowball.service.StaticService;
+import com.meetingjava.snowball.service.CheckService;
+
 import java.util.Date;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,7 +13,7 @@ public class Dashboard {
 
     private final ScheduleService scheduleService;
     private final StaticService staticService;
-    private final Check checkService;
+    private final CheckService checkService;
 
     private String meeting;
     private float attendanceRate;
@@ -20,8 +22,8 @@ public class Dashboard {
     private Date todayMeeting;
 
     public Dashboard(ScheduleService scheduleService,
-            StaticService staticService,
-            Check checkService) {
+                     StaticService staticService,
+                     CheckService checkService) {
         this.scheduleService = scheduleService;
         this.staticService = staticService;
         this.checkService = checkService;
@@ -48,20 +50,13 @@ public class Dashboard {
         staticService.getTodaySchedule(meeting)
                 .ifPresent(s -> this.todayMeeting = java.sql.Date.valueOf(s.getStartDate()));
 
-        if (checkService != null && checkServiceEnable()) {
-            checkService.checkOn();
+        // 출석 퀴즈가 존재하는지 확인만
+        if (checkService.getByMeetingId(meeting).isPresent()) {
+            System.out.println("✅ 출석 퀴즈가 존재합니다.");
         }
     }
 
     public Summary getSummary() {
         return new Summary(meeting, attendanceRate, totalMeetingCount, upcomingMeeting, todayMeeting);
-    }
-
-    private boolean checkServiceEnable() {
-        try {
-            return (boolean) Check.class.getDeclaredField("enable").get(checkService);
-        } catch (Exception e) {
-            return false;
-        }
     }
 }
