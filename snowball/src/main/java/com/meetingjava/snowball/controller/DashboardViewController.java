@@ -85,8 +85,7 @@ public class DashboardViewController {
     public List<ScheduleEventdto> getCalendarEventsByMeetingId(@PathVariable int year,
                                                                @PathVariable int month,
                                                                @RequestParam String meetingId) {
-        return scheduleService.getSchedulesByMonth(year, month).stream()
-                .filter(s -> s.getMeetingId().equals(meetingId))
+        return scheduleService.getSchedulesByMeetingAndMonth(meetingId, year, month).stream()
                 .map(ScheduleEventdto::from)
                 .toList();
     }

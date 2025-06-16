@@ -7,7 +7,7 @@ public class ScheduleEventdto {
     private String start;
     private String end;
 
-    // ✅ 기본 생성자 꼭 필요 (for JSON serialization)
+    // 기본 생성자 꼭 필요 (for JSON serialization)
     public ScheduleEventdto() {
     }
 

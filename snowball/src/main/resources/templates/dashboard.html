@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대시보드</title>
-    
+
     <!-- FullCalendar CDN -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js'></script>
@@ -126,16 +126,16 @@
     <a th:href="@{/home}" style="text-decoration: none; color: black; font-size: 24px; padding: 4px 12px;">←</a>
     <h1 th:text="${meetingName}">모임 이름</h1>
 
-<div class="grid">
-    <div class="card">
-        <div class="percentage" th:text="|${groupAttendanceRate}%|">0.0%</div>
-        <div class="label">우리 모임 출석률</div>
+    <div class="grid">
+        <div class="card">
+            <div class="percentage" th:text="|${groupAttendanceRate}%|">0.0%</div>
+            <div class="label">우리 모임 출석률</div>
+        </div>
+        <div class="card">
+            <div class="percentage" th:text="|${myAttendanceRate}%|">0.0%</div>
+            <div class="label">나의 출석률</div>
+        </div>
     </div>
-    <div class="card">
-        <div class="percentage" th:text="|${myAttendanceRate}%|">0.0%</div>
-        <div class="label">나의 출석률</div>
-    </div>
-</div>
 
     <div class="block next-meeting">
         <div class="label">다음 모임</div>
@@ -150,23 +150,13 @@
     </div>
 </main>
 
-<!-- 하단 네비게이션 바 -->
-<nav class="nav">
-    <a class="nav-link" th:href="@{/schedulemake(meetingId=${meetingId})}">
-        <div>📝</div>
-        <div>일정 생성</div>
-    </a>
-    <a class="nav-link" th:href="@{'/schedule/candidates/' + ${meetingId}}">
-        <div>📋</div>
-        <div>일정 투표</div>
-    </a>
-    <a class="nav-link" th:href="@{/check/home(meetingId=${meetingId})}">
-        <div>✅</div>
-        <div>출석 확인</div>
-    </a>
-</nav>
+<!-- meetingId Thymeleaf → JS 변수 주입 -->
+<script th:inline="javascript">
+    const meetingId = /*[[${meetingId}]]*/ "0";
+    console.log("✅ 전달된 meetingId:", meetingId);
+</script>
 
-<!-- FullCalendar 렌더링 -->
+<!-- FullCalendar 일정 로드 (meetingId별 일정만) -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
@@ -174,8 +164,6 @@
             console.log("❌ calendar element not found!");
             return;
         }
-
-        const meetingId = /*[[${meetingId}]]*/ 0;
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
@@ -185,7 +173,8 @@
                 const year = info.start.getFullYear();
                 const month = info.start.getMonth() + 1;
 
-                fetch(`/api/schedule/calendar/events/${year}/${month}`)
+                // DashboardViewController를 타는 정확한 경로
+                fetch(`/dashboard/api/calendar/events/${year}/${month}?meetingId=${meetingId}`)
                     .then(response => response.json())
                     .then(data => {
                         console.log("📅 일정 로드 성공:", data);
@@ -205,8 +194,6 @@
 <!-- 다음 모임 표시 -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const meetingId = /*[[${meetingId}]]*/ 0;
-
         fetch(`/api/schedule/next?meetingId=${meetingId}`)
             .then(res => res.json())
             .then(data => {
@@ -218,10 +205,27 @@
                         target.textContent = "예정된 모임이 없습니다.";
                     }
                 }
+            })
+            .catch(error => {
+                console.error("📌 다음 모임 정보 불러오기 실패:", error);
             });
     });
-       // 콘솔로 meetingId 값 확인!
-       console.log("🪪 전달된 meetingId:", meetingId);
 </script>
+
+<!-- 하단 네비게이션 -->
+<nav class="nav">
+    <a class="nav-link" th:href="@{/schedulemake(meetingId=${meetingId})}">
+        <div>📝</div>
+        <div>일정 생성</div>
+    </a>
+    <a class="nav-link" th:href="@{'/schedule/candidates/' + ${meetingId}}">
+        <div>📋</div>
+        <div>일정 투표</div>
+    </a>
+    <a class="nav-link" th:href="@{/check/home(meetingId=${meetingId})}">
+        <div>✅</div>
+        <div>출석 확인</div>
+    </a>
+</nav>
 </body>
 </html>
