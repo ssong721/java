@@ -17,4 +17,6 @@ public interface ScheduleCandidateRepository extends JpaRepository<ScheduleCandi
     // ✅ 이거 추가해 — meetingId로 schedule_name 조회
     @Query("SELECT sc.scheduleName FROM ScheduleCandidate sc WHERE sc.meetingId = :meetingId")
     Optional<String> findFirstScheduleNameByMeetingId(@Param("meetingId") String meetingId);
+
+    Optional<ScheduleCandidate> findByVoteId(String voteId);
 }

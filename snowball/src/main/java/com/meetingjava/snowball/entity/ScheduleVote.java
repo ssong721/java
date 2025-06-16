@@ -159,4 +159,13 @@ public class ScheduleVote {
     public void setAvailableUsers(List<String> availableUsers) {
         this.availableUsers = availableUsers;
     }
+
+    // ✅ 수동 설정을 위한 Setter 추가 (스케줄 생성 시 연동)
+    public void setVoteId(String voteId) {
+        this.voteId = voteId;
+    }
+
+    public void setMeetingId(String meetingId) {
+        this.meetingId = meetingId;
+    }
 }

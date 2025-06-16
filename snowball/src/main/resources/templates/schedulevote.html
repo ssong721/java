@@ -85,8 +85,9 @@
   const baseDate = new Date('2025-06-15'); // 일요일 시작
 
   function goToRecommendation() {
-    window.location.href = `/recommendation/${meetingId}`;
+    window.location.href = `/recommendation/${voteId}`;
   }
+
 
   document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('voteGrid');

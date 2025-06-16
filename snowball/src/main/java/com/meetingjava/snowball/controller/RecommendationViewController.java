@@ -27,9 +27,11 @@ public class RecommendationViewController {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleCandidateRepository scheduleCandidateRepository;
 
-    @GetMapping("/recommendation/{meetingId}")
-    public String showRecommendationPage(@PathVariable String meetingId, Model model) {
-        Map<String, Object> result = recommendationService.getRecommendedInfo(meetingId);
+    @GetMapping("/recommendation/{voteId}")
+    public String showRecommendationPage(@PathVariable("voteId") String voteId, Model model) {
+        voteId = voteId.replaceAll("\"", ""); // ✅ 따옴표 제거
+
+        Map<String, Object> result = scheduleVoteService.getRecommendedTimeInfoByVoteId(voteId);
 
         Date bestTime = (Date) result.get("recommendedTime");
         List<String> availableUsers = (List<String>) result.get("availableUsers");
@@ -41,29 +43,19 @@ public class RecommendationViewController {
                     .format(DateTimeFormatter.ofPattern("E요일 HH시", Locale.KOREAN));
         }
 
-        // ✅ 추천 시간과 가장 먼저 일치하는 후보 일정 가져오기
-        Optional<ScheduleCandidate> matchingCandidate = Optional.empty();
-        if (bestTime != null) {
-            List<ScheduleCandidate> candidates = scheduleCandidateRepository.findByMeetingId(meetingId);
-            matchingCandidate = candidates.stream()
-                .filter(c -> {
-                    LocalDate cDate = c.getStartDate();
-                    LocalTime cTime = c.getStartTime();
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(bestTime);
-                    return cDate.equals(LocalDate.of(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH)))
-                        && cTime.equals(LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE)));
-                })
-                .findFirst();
-        }
+        // ✅ voteId로 직접 일정 후보 가져오기
+        Optional<ScheduleCandidate> candidateOpt = scheduleCandidateRepository.findByVoteId(voteId);
+        String scheduleName = candidateOpt.map(ScheduleCandidate::getScheduleName).orElse("확정 일정");
+        Long candidateId = candidateOpt.map(ScheduleCandidate::getId).orElse(null);
+        String meetingId = candidateOpt.map(ScheduleCandidate::getMeetingId).orElse("unknown");
 
-        Long candidateId = matchingCandidate.map(ScheduleCandidate::getId).orElse(null);
-
+        model.addAttribute("voteId", voteId);
         model.addAttribute("meetingId", meetingId);
+        model.addAttribute("scheduleName", scheduleName);
         model.addAttribute("recommendedTime", bestTime);
         model.addAttribute("formattedRecommendedTime", formattedTime);
         model.addAttribute("availableUsers", availableUsers);
-        model.addAttribute("candidateId", candidateId);  // ✅ HTML에 넘기기
+        model.addAttribute("candidateId", candidateId);
 
         return "recommendation";
     }
@@ -71,21 +63,21 @@ public class RecommendationViewController {
     @PostMapping("/recommendation/{meetingId}/confirm")
     @ResponseBody
     public String confirmSchedule(@PathVariable String meetingId,
-                                @RequestParam("startDate") String startDateStr,
-                                @RequestParam("endDate") String endDateStr,
-                                @RequestParam("startHour") int startHour,
-                                @RequestParam("startMin") int startMin,
-                                @RequestParam("endHour") int endHour,
-                                @RequestParam("endMin") int endMin,
-                                @RequestParam(value = "candidateId", required = false) String candidateIdStr) {
+                                  @RequestParam("startDate") String startDateStr,
+                                  @RequestParam("endDate") String endDateStr,
+                                  @RequestParam("startHour") int startHour,
+                                  @RequestParam("startMin") int startMin,
+                                  @RequestParam("endHour") int endHour,
+                                  @RequestParam("endMin") int endMin,
+                                  @RequestParam(value = "candidateId", required = false) String candidateIdStr) {
 
         LocalDate startDate = LocalDate.parse(startDateStr);
         LocalDate endDate = LocalDate.parse(endDateStr);
         LocalTime startTime = LocalTime.of(startHour, startMin);
         LocalTime endTime = LocalTime.of(endHour, endMin);
 
-        // ✅ schedule_name을 후보 일정에서 가져오기
-        String scheduleName = "확정 일정";
+        String scheduleName = "확정 일정";  // 기본값
+
         try {
             if (candidateIdStr != null && !candidateIdStr.isBlank()) {
                 Long candidateId = Long.parseLong(candidateIdStr);

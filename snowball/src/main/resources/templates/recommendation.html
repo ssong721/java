@@ -101,8 +101,8 @@
       <span th:if="${recommendedTime == null}">추천 시간이 없습니다</span>
     </div>
 
-    <!-- ✅ 수정된 부분: JS에서 읽히도록 value 속성 명시 -->
-    <input type="hidden" id="candidateId" th:attr="value=${candidateId}" />
+    <!-- ✅ 후보 ID 전달용: null일 경우 빈 문자열 -->
+    <input type="hidden" id="candidateId" name="candidateId" th:value="${candidateId} ?: ''" />
 
     <label class="label">시작 날짜</label>
     <input type="date" id="startDate" required />
@@ -160,7 +160,7 @@
         startMin: document.getElementById('startMin').value,
         endHour: document.getElementById('endHour').value,
         endMin: document.getElementById('endMin').value,
-        candidateId: document.getElementById('candidateId').value // ✅ candidateId 전달
+        candidateId: document.getElementById('candidateId').value
       });
 
       fetch(`/recommendation/${meetingId}/confirm`, {
@@ -174,7 +174,7 @@
       .then(text => {
         if (text === 'ok') {
           alert('✅ 일정이 확정되었습니다!');
-          window.location.href = `/dashboard/${meetingId}`;
+          location.href = `/dashboard/${meetingId}`;
         } else {
           alert('❌ 일정 확정 실패 😥');
         }

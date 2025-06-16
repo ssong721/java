@@ -63,7 +63,8 @@ public class ScheduleApiController {
                                 @RequestParam String startAMPM,
                                 @RequestParam String endHour,
                                 @RequestParam String endMin,
-                                @RequestParam String endAMPM) {
+                                @RequestParam String endAMPM,
+                                @RequestParam String meetingId) { // ✅ 여기서 meetingId도 받음 {
 
         System.out.println("🔥 submit 호출됨: " + startDate);
 
@@ -80,10 +81,17 @@ public class ScheduleApiController {
         schedule.setStartTime(start);
         schedule.setEndTime(end);
 
+        // ✅ voteId 동적 생성
+        schedule.setVoteId(UUID.randomUUID().toString());
+
+        // ✅ 진짜 meetingId 세팅
+        schedule.setMeetingId(meetingId);
+
         scheduleRepository.save(schedule);
 
-        return "redirect:/dashboard/sample-meeting-id";
-    }
+        // ✅ 생성한 meetingId로 리디렉션
+        return "redirect:/dashboard/" + meetingId;
+        }
 
     // 다음 확정 일정 조회
     @GetMapping("/next")
