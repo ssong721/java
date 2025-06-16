@@ -48,8 +48,9 @@
 <div class="container">
   <div class="title" th:text="${meetingName} + ' - 일정 후보 목록'">모임 일정 후보 목록</div>
 
+  <!-- ✅ 후보 일정 리스트 반복 -->
   <a th:each="c : ${candidates}"
-     th:href="@{'/schedule/candidates/schedulevote/from-candidate/' + ${c.id}}"
+     th:href="@{'/schedulevote/' + ${c.voteId}}"
      style="text-decoration: none; color: inherit;">
     <div class="candidate-card">
       <div class="label">제목</div>
@@ -63,6 +64,7 @@
     </div>
   </a>
 
+  <!-- 대시보드로 돌아가기 -->
   <div class="text-center mt-4">
     <a class="btn btn-outline-secondary" th:href="@{'/dashboard/' + ${meetingId}}">← 대시보드로</a>
   </div>

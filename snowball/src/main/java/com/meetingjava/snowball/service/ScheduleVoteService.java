@@ -220,17 +220,12 @@ public class ScheduleVoteService {
         }
     }
 
-    public Map<String, Object> getRecommendedTimeInfo(String meetingId) {
-        ScheduleVote vote = findByMeetingId(meetingId);
-        String voteId = vote.getVoteId();
-
-        System.out.println("✅ voteId: " + voteId);
-
+    public Map<String, Object> getRecommendedTimeInfoByVoteId(String voteIdRaw) {
+        String voteId = voteIdRaw.replaceAll("\"", "");
         List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_VoteId(voteId);
-        Map<Date, Integer> countMap = new HashMap<>();
-        System.out.println("✅ submissions 개수: " + submissions.size());
+        System.out.println("🔍 submissions.size: " + submissions.size());
 
-        
+        Map<Date, Integer> countMap = new HashMap<>();
         for (VoteSubmission submission : submissions) {
             Date time = submission.getSelectedTime();
             countMap.put(time, countMap.getOrDefault(time, 0) + 1);

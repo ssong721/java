@@ -33,6 +33,9 @@ public class Schedule {
 
     // 모임 구분용 필드 (예: 어떤 모임에 속한 일정인지)
     private String meetingId;
+    
+    @Column(unique = true)
+    private String voteId;
 
     // 시작일 + 시작시간 → ISO 8601 형식 문자열 반환
     public String getStart() {
