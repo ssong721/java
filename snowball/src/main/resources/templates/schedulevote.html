@@ -49,6 +49,11 @@
       color: white;
     }
 
+    .vote-grid div.disabled {
+      background-color: #f0f0f0;
+      color: #aaa;
+    }
+
     .button-row {
       display: flex;
       justify-content: center;
@@ -76,9 +81,11 @@
 
 <script th:inline="javascript">
 /*<![CDATA[*/
-  const voteId = '[[${voteId}]]';
+  const voteIdRaw = '[[${voteId}]]';
+  const voteId = voteIdRaw.replaceAll('"', '');
   const meetingId = '[[${meetingId}]]';
   const userName = '변지민';
+  const allowedTimes = JSON.parse(/*[[${allowedTimesJson}]]*/ "[]");
 /*]]>*/
 
   const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
@@ -87,7 +94,6 @@
   function goToRecommendation() {
     window.location.href = `/recommendation/${voteId}`;
   }
-
 
   document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('voteGrid');
@@ -111,21 +117,31 @@
         const date = new Date(baseDate);
         date.setDate(baseDate.getDate() + i);
         date.setHours(hour, 0, 0, 0);
-        cell.classList.add('selectable');
-        cell.dataset.datetime = date.toISOString();
+
+        // ✅ UTC 기준으로 ISO 문자열 생성
+        const utcISOString = new Date(Date.UTC(
+          date.getFullYear(), date.getMonth(), date.getDate(), hour, 0, 0
+        )).toISOString().slice(0, 19);
+
+        if (allowedTimes.includes(utcISOString)) {
+          cell.classList.add('selectable');
+          cell.dataset.datetime = new Date(Date.UTC(
+            date.getFullYear(), date.getMonth(), date.getDate(), hour, 0, 0
+          )).toISOString(); // UTC ISO 전체 저장
+          cell.addEventListener('click', () => {
+            cell.classList.toggle('selected');
+          });
+        } else {
+          cell.classList.add('disabled');
+        }
+
         grid.appendChild(cell);
       }
     }
 
-    document.querySelectorAll('.selectable').forEach(cell => {
-      cell.addEventListener('click', () => {
-        cell.classList.toggle('selected');
-      });
-    });
-
     document.getElementById('submitVoteBtn').addEventListener('click', () => {
       const selectedTimes = Array.from(document.querySelectorAll('.selected')).map(cell => {
-        return new Date(cell.dataset.datetime).toISOString();
+        return cell.dataset.datetime;  // UTC 기준
       });
 
       const data = {

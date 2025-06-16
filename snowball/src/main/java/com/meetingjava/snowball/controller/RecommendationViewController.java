@@ -5,7 +5,7 @@ import com.meetingjava.snowball.entity.ScheduleCandidate;
 import com.meetingjava.snowball.repository.ScheduleCandidateRepository;
 import com.meetingjava.snowball.repository.ScheduleRepository;
 import com.meetingjava.snowball.service.ScheduleVoteService;
-import com.meetingjava.snowball.service.RecommendationService;
+// import com.meetingjava.snowball.service.RecommendationService; // ❌ 사용 안 하므로 주석 처리 or 삭제
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,7 @@ import java.util.*;
 @Controller
 public class RecommendationViewController {
 
-    private final RecommendationService recommendationService;
+    // private final RecommendationService recommendationService; // ❌ 미사용
     private final ScheduleVoteService scheduleVoteService;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleCandidateRepository scheduleCandidateRepository;
@@ -34,6 +34,8 @@ public class RecommendationViewController {
         Map<String, Object> result = scheduleVoteService.getRecommendedTimeInfoByVoteId(voteId);
 
         Date bestTime = (Date) result.get("recommendedTime");
+
+        @SuppressWarnings("unchecked") // ⚠️ Unchecked cast 경고 제거
         List<String> availableUsers = (List<String>) result.get("availableUsers");
 
         String formattedTime = null;
@@ -43,11 +45,13 @@ public class RecommendationViewController {
                     .format(DateTimeFormatter.ofPattern("E요일 HH시", Locale.KOREAN));
         }
 
-        // ✅ voteId로 직접 일정 후보 가져오기
-        Optional<ScheduleCandidate> candidateOpt = scheduleCandidateRepository.findByVoteId(voteId);
-        String scheduleName = candidateOpt.map(ScheduleCandidate::getScheduleName).orElse("확정 일정");
-        Long candidateId = candidateOpt.map(ScheduleCandidate::getId).orElse(null);
-        String meetingId = candidateOpt.map(ScheduleCandidate::getMeetingId).orElse("unknown");
+        // ✅ voteId로 후보 일정 리스트 가져오기
+        List<ScheduleCandidate> candidates = scheduleCandidateRepository.findByVoteId(voteId);
+        ScheduleCandidate firstCandidate = candidates.isEmpty() ? null : candidates.get(0);
+
+        String scheduleName = (firstCandidate != null) ? firstCandidate.getScheduleName() : "확정 일정";
+        Long candidateId = (firstCandidate != null) ? firstCandidate.getId() : null;
+        String meetingId = (firstCandidate != null) ? firstCandidate.getMeetingId() : "unknown";
 
         model.addAttribute("voteId", voteId);
         model.addAttribute("meetingId", meetingId);
@@ -76,7 +80,7 @@ public class RecommendationViewController {
         LocalTime startTime = LocalTime.of(startHour, startMin);
         LocalTime endTime = LocalTime.of(endHour, endMin);
 
-        String scheduleName = "확정 일정";  // 기본값
+        String scheduleName = "확정 일정";
 
         try {
             if (candidateIdStr != null && !candidateIdStr.isBlank()) {
