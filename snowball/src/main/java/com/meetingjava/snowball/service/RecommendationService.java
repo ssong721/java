@@ -1,24 +1,25 @@
 package com.meetingjava.snowball.service;
 
+import com.meetingjava.snowball.entity.ScheduleVote;
 import com.meetingjava.snowball.entity.VoteSubmission;
 import com.meetingjava.snowball.repository.VoteSubmissionRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class RecommendationService {
 
     private final VoteSubmissionRepository voteSubmissionRepository;
+    private final ScheduleVoteService scheduleVoteService; // ✅ voteId 얻기 위해 필요
 
     public Map<String, Object> getRecommendedInfo(String meetingId) {
-        List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_MeetingId(meetingId);
+        ScheduleVote vote = scheduleVoteService.findByMeetingId(meetingId); // ✅ voteId 조회
+        String voteId = vote.getVoteId();
+
+        List<VoteSubmission> submissions = voteSubmissionRepository.findByVote_VoteId(voteId); // ✅ 핵심 수정
         System.out.println("📊 투표 개수: " + submissions.size());
 
         Map<Date, Integer> countMap = new HashMap<>();
