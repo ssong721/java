@@ -8,7 +8,7 @@ public class DashboardResponse {
     private float groupAttendanceRate;
     private Schedule nextMeeting;
     private List<Schedule> calendar;
-    private String noticeTitle; // 🔹 새 필드 추가
+    private String noticeTitle; // 새 필드 추가
 
     public DashboardResponse(float groupAttendanceRate, Schedule nextMeeting, List<Schedule> calendar, String noticeTitle) {
         this.groupAttendanceRate = groupAttendanceRate;

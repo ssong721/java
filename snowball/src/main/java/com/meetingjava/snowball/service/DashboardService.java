@@ -53,10 +53,19 @@ public class DashboardService {
     }
 
     public String getNextMeetingInfo(String meetingId) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        return staticService.getUpcomingSchedule(String.valueOf(meetingId))
-                .map(s -> s.getStartDate().format(formatter) + " - " + s.getScheduleName())
-                .orElse("예정된 모임이 없습니다.");
-    }
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    
+        return staticService.getUpcomingSchedule(meetingId)
+            .map(s -> String.format(
+                "%s (%s %s ~ %s)",
+                s.getScheduleName(),
+                s.getStartDate().format(dateFormatter),
+                s.getStartTime().format(timeFormatter),
+                s.getEndTime().format(timeFormatter)
+            ))
+            .orElse("예정된 모임이 없습니다.");
+    }    
 }
+    
+    

@@ -18,12 +18,19 @@ public class ScheduleEventdto {
     }
 
     public static ScheduleEventdto from(Schedule schedule) {
-        return new ScheduleEventdto(
-            schedule.getScheduleName(),
-            schedule.getStart(), // ISO_DATETIME
-            schedule.getEnd()
-        );
-    }
+        String startTime = schedule.getStartTime().toString();  
+        String endTime = schedule.getEndTime().toString();      
+        String name = schedule.getScheduleName();            
+    
+        // 출력 포맷: 모임명 시작~종료
+        String fullTitle = name + " " + startTime + " ~ " + endTime;
+
+    return new ScheduleEventdto(
+        fullTitle,
+        schedule.getStart(), // 시작 ISO_DATETIME
+        schedule.getEnd()    // 종료 ISO_DATETIME
+    );
+}
 
     public String getTitle() {
         return title;
