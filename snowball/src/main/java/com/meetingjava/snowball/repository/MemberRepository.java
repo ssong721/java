@@ -12,4 +12,5 @@ public interface MemberRepository extends JpaRepository<Member, String> {
     Optional<Member> findByUserAndMeeting(User user, Meeting meeting);
     List<Member> findByMeeting(Meeting meeting);
     int countByMeeting(Meeting meeting);
+    int countByMeetingId(String meetingId);
 }

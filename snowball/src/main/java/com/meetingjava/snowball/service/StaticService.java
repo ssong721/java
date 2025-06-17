@@ -3,6 +3,7 @@ package com.meetingjava.snowball.service;
 import com.meetingjava.snowball.entity.Attendance;
 import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.repository.AttendanceRepository;
+import com.meetingjava.snowball.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,23 +14,23 @@ import java.util.stream.Collectors;
 public class StaticService {
 
     private final AttendanceRepository attendanceRepository;
+    private final MemberRepository memberRepository;
     private final List<Schedule> allSchedules;
 
-    public StaticService(AttendanceRepository attendanceRepository) {
+    public StaticService(AttendanceRepository attendanceRepository, MemberRepository memberRepository) {
         this.attendanceRepository = attendanceRepository;
+        this.memberRepository = memberRepository;
         this.allSchedules = new ArrayList<>();
     }
 
-    // 전체 출석률 자동 계산 (해당 모임 기준)
+    // 전체 출석률 자동 계산 (해당 모임 기준, 정확한 분모 사용)
     public float calculateAttendanceRate(String meetingId) {
-        List<Attendance> records = attendanceRepository.findByMeetingId(meetingId);
-        if (records.isEmpty()) return 0f;
+        int totalMembers = memberRepository.countByMeetingId(meetingId);
+        if (totalMembers == 0) return 0f;
 
-        long presentCount = records.stream()
-                .filter(Attendance::isPresent)
-                .count();
+        int presentCount = attendanceRepository.countPresentByMeetingId(meetingId);
 
-        return (float) presentCount / records.size() * 100f;
+        return (float) presentCount / totalMembers * 100f;
     }
 
     // 사용자 출석률 자동 계산 (모임 기준)
@@ -82,4 +83,18 @@ public class StaticService {
     public List<Schedule> getAllSchedules() {
         return allSchedules;
     }
+
+    public double calculateAccurateAttendanceRate(String meetingId, List<Schedule> schedules, int totalMembers) {
+        if (schedules == null || schedules.isEmpty() || totalMembers == 0) return 0.0;
+
+        double totalRate = 0.0;
+
+        for (Schedule schedule : schedules) {
+            int presentCount = attendanceRepository.countPresentMembers(meetingId, schedule.getId());
+            totalRate += ((double) presentCount / totalMembers);
+        }
+
+        return (totalRate / schedules.size()) * 100.0;
+    }
 }
+

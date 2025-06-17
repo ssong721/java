@@ -22,4 +22,8 @@ public class Attendance {
     private String meetingId;    // 해당 모임 ID
     private LocalDate attendanceDate; // 출석한 날짜
     private boolean present;     // 출석 여부 (true = 출석)
+
+    @Column(name = "schedule_id")
+    private Long scheduleId;
+
 }
