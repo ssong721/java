@@ -48,6 +48,6 @@ public class ScheduleCandidateViewController {
         ScheduleVote vote = scheduleVoteService.findByMeetingId(meetingId);
 
         // 4. voteId를 이용해 리디렉션
-        return "redirect:/schedulevote/" + vote.getVoteId();  // ✅ voteId로 리다이렉트
+        return "redirect:/schedulevote/" + vote.getVoteId();  // voteId로 리다이렉트
     }
 }

@@ -70,7 +70,7 @@
             border-radius: 10px;
             margin-bottom: 10px;
             font-size: 16px;
-            min-height: 350px;
+            min-height: 400px;
         }
 
         .next-meeting {
@@ -168,7 +168,11 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'ko',
-            height: 'auto',
+            height: '700',
+            dayMaxEventRows: true,
+            eventDisplay: 'block',
+            displayEventTime: false,  // 자동 시간 출력 제거
+            
             events: function(info, successCallback, failureCallback) {
                 const year = info.start.getFullYear();
                 const month = info.start.getMonth() + 1;
