@@ -1,8 +1,10 @@
 package com.meetingjava.snowball.service;
 
 import com.meetingjava.snowball.entity.Attendance;
+import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.repository.AttendanceRepository;
+import com.meetingjava.snowball.repository.MeetingRepository;
 import com.meetingjava.snowball.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,23 +17,31 @@ public class StaticService {
 
     private final AttendanceRepository attendanceRepository;
     private final MemberRepository memberRepository;
+    private final MeetingRepository meetingRepository;
     private final List<Schedule> allSchedules;
 
-    public StaticService(AttendanceRepository attendanceRepository, MemberRepository memberRepository) {
+    public StaticService(AttendanceRepository attendanceRepository,
+                         MemberRepository memberRepository,
+                         MeetingRepository meetingRepository) {
         this.attendanceRepository = attendanceRepository;
         this.memberRepository = memberRepository;
+        this.meetingRepository = meetingRepository;
         this.allSchedules = new ArrayList<>();
     }
 
-    // 전체 출석률 자동 계산 (해당 모임 기준, 정확한 분모 사용)
+    // 전체 출석률 자동 계산 (모임 기준)
     public float calculateAttendanceRate(String meetingId) {
-        int totalMembers = memberRepository.countByMeetingId(meetingId);
+        Meeting meeting = meetingRepository.findById(meetingId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
+
+        int totalMembers = memberRepository.countByMeeting(meeting);
         if (totalMembers == 0) return 0f;
 
         int presentCount = attendanceRepository.countPresentByMeetingId(meetingId);
 
         return (float) presentCount / totalMembers * 100f;
     }
+
 
     // 사용자 출석률 자동 계산 (모임 기준)
     public double calculateUserAttendanceRate(String username, String meetingId) {
