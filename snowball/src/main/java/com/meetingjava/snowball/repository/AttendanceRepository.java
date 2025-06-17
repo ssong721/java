@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import com.meetingjava.snowball.repository.AttendanceRepository;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,4 +27,13 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Modifying
     @Query("DELETE FROM Attendance a WHERE a.meetingId = :meetingId")
     void deleteByMeetingId(@Param("meetingId") String meetingId);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.meetingId = :meetingId AND a.scheduleId = :scheduleId AND a.present = true")
+    int countPresentMembers(@Param("meetingId") String meetingId, @Param("scheduleId") Long scheduleId);
+    
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.meetingId = :meetingId AND a.present = true")
+    int countPresentByMeetingId(@Param("meetingId") String meetingId);
+    
 }
+
+

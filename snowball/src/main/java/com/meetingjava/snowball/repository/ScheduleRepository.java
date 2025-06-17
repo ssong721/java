@@ -23,4 +23,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     // 데이터 삭제
     void deleteByMeetingId(String meetingId);
+
+    List<Schedule> findByMeetingId(String meetingId);
 }

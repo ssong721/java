@@ -49,4 +49,7 @@ public class ScheduleService {
                 .filter(s -> s.getScheduleName() != null && !s.getScheduleName().isBlank())
                 .toList();
     }
+    public List<Schedule> getSchedulesByMeetingId(String meetingId) {
+        return scheduleRepository.findByMeetingId(meetingId);
+    }
 }

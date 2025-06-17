@@ -1,8 +1,11 @@
 package com.meetingjava.snowball.service;
 
 import com.meetingjava.snowball.entity.Attendance;
+import com.meetingjava.snowball.entity.Meeting;
 import com.meetingjava.snowball.entity.Schedule;
 import com.meetingjava.snowball.repository.AttendanceRepository;
+import com.meetingjava.snowball.repository.MeetingRepository;
+import com.meetingjava.snowball.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,24 +16,32 @@ import java.util.stream.Collectors;
 public class StaticService {
 
     private final AttendanceRepository attendanceRepository;
+    private final MemberRepository memberRepository;
+    private final MeetingRepository meetingRepository;
     private final List<Schedule> allSchedules;
 
-    public StaticService(AttendanceRepository attendanceRepository) {
+    public StaticService(AttendanceRepository attendanceRepository,
+                         MemberRepository memberRepository,
+                         MeetingRepository meetingRepository) {
         this.attendanceRepository = attendanceRepository;
+        this.memberRepository = memberRepository;
+        this.meetingRepository = meetingRepository;
         this.allSchedules = new ArrayList<>();
     }
 
-    // 전체 출석률 자동 계산 (해당 모임 기준)
+    // 전체 출석률 자동 계산 (모임 기준)
     public float calculateAttendanceRate(String meetingId) {
-        List<Attendance> records = attendanceRepository.findByMeetingId(meetingId);
-        if (records.isEmpty()) return 0f;
+        Meeting meeting = meetingRepository.findById(meetingId)
+        .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 
-        long presentCount = records.stream()
-                .filter(Attendance::isPresent)
-                .count();
+        int totalMembers = memberRepository.countByMeeting(meeting);
+        if (totalMembers == 0) return 0f;
 
-        return (float) presentCount / records.size() * 100f;
+        int presentCount = attendanceRepository.countPresentByMeetingId(meetingId);
+
+        return (float) presentCount / totalMembers * 100f;
     }
+
 
     // 사용자 출석률 자동 계산 (모임 기준)
     public double calculateUserAttendanceRate(String username, String meetingId) {
@@ -82,4 +93,18 @@ public class StaticService {
     public List<Schedule> getAllSchedules() {
         return allSchedules;
     }
+
+    public double calculateAccurateAttendanceRate(String meetingId, List<Schedule> schedules, int totalMembers) {
+        if (schedules == null || schedules.isEmpty() || totalMembers == 0) return 0.0;
+
+        double totalRate = 0.0;
+
+        for (Schedule schedule : schedules) {
+            int presentCount = attendanceRepository.countPresentMembers(meetingId, schedule.getId());
+            totalRate += ((double) presentCount / totalMembers);
+        }
+
+        return (totalRate / schedules.size()) * 100.0;
+    }
 }
+
