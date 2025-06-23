@@ -34,6 +34,9 @@
     <form action="#" th:action="@{/newmeeting}" method="post">
         <h1 class="h3 mb-3 fw-normal text-center">모임 만들기</h1>
 
+        <!-- 에러 메시지 출력 -->
+        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+
         <div class="form-floating">
             <input type="text" class="form-control" id="floatingInput" name="meetingName" placeholder="모임 이름">
             <label for="floatingInput">모임명</label>

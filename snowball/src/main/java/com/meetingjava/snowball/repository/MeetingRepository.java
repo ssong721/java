@@ -23,4 +23,8 @@ public interface MeetingRepository extends JpaRepository<Meeting, String> {
 
     // ID로 모임 조회 (기존 메서드와 충돌 없음)
     Optional<Meeting> findById(String id);
+
+    // meetingName 중복인지 확인
+    boolean existsByMeetingName(String meetingName);
+
 }

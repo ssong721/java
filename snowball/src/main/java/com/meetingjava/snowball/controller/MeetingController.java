@@ -41,15 +41,20 @@ public class MeetingController {
     }
 
     @PostMapping("/newmeeting")
-    public String createMeeting(@RequestParam("meetingName") String meetingName, 
-                                @AuthenticationPrincipal UserDetails userDetails) {
+    public String createMeeting(@RequestParam("meetingName") String meetingName,
+                                @AuthenticationPrincipal UserDetails userDetails,
+                                Model model) {
 
-        // TODO: 로그인한 사용자에서 모임장 정보 가져오기 (예시로 "host1" 고정)
         String hostUsername = userDetails.getUsername();
 
-        meetingService.createMeeting(meetingName, hostUsername);
-
-        return "redirect:/home";  // 홈 화면으로 리디렉션
+        try {
+            meetingService.createMeeting(meetingName, hostUsername);
+            return "redirect:/home";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("meetingName", meetingName); // 입력값 유지
+            return "newmeeting"; // 다시 폼 페이지로
+        }
     }
 
     @GetMapping("/newmeeting")
