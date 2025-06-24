@@ -28,6 +28,10 @@ public class MeetingService {
     }
 
     public Meeting createMeeting(String meetingName, String hostUsername) {
+        if (meetingRepository.existsByMeetingName(meetingName)) {
+            throw new IllegalArgumentException("이미 존재하는 모임 이름입니다.");
+        }
+        
         Date now = new Date();
 
         User user = userRepository.findByUsername(hostUsername)
