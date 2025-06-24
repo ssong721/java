@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class StaticService {
@@ -42,6 +41,19 @@ public class StaticService {
         return (float) presentCount / totalMembers * 100f;
     }
 
+    /**
+    * 해당 모임의 전체 출석률을 계산합니다.
+    * 공식: 전체 출석률 = (출석한 총 횟수 / (총 인원 수 × 총 일정 수)) × 100
+    */
+    public double calculateGlobalAttendanceRate(String meetingId) {
+        int totalPresent = attendanceRepository.countPresentByMeetingId(meetingId);
+        int totalUsers = attendanceRepository.countDistinctUsersByMeetingId(meetingId);
+        int totalSchedules = attendanceRepository.countDistinctSchedulesByMeetingId(meetingId);
+
+        if (totalUsers == 0 || totalSchedules == 0) return 0.0;
+
+        return (double) totalPresent * 100 / (totalUsers * totalSchedules);
+    }
 
     // 사용자 출석률 자동 계산 (모임 기준)
     public double calculateUserAttendanceRate(String username, String meetingId) {
